@@ -1,0 +1,4 @@
+psalmtitle|Ps 116. Laudate Dominum|圣咏第116首|
+dropcap|Laudáte Dóminum, omnes gentes: laudáte eum, omnes pópuli: Quóniam confirmáta est super nos misericórdia ejus: et véritas Dómini manet in ætérnum.|請諸異教者稱頌主，衆民稱頌主。盖主慈堅定於我等，而純誠存於無窮世。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

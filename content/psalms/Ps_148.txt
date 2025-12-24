@@ -1,0 +1,15 @@
+psalmtitle|Ps 148. Laudate Dominum|圣咏第148首|
+dropcap|Laudáte Dóminum de cælis: laudáte eum in excélsis.|請衆自諸天讚美主，而於峻極讚美之。|
+verse|Laudáte eum, omnes Ángeli ejus: laudáte eum, omnes virtútes ejus.|衆天神讚美主，厥諸品德讚美主。|
+verse|Laudáte eum, sol et luna: laudáte eum, omnes stellæ et lumen.|太陽太陰讚美主，諸星與光讚美主。|
+verse|Laudáte eum, cæli cælórum: et aquæ omnes, quæ super cælos sunt, laudent nomen Dómini.|諸天之天讚美主，及在諸天上之水讚美主名。|
+verse|Quia ipse dixit, et facta sunt: ipse mandávit, et creáta sunt.|盖主一言而萬有受成，主一命而萬有受造。|
+verse|Státuit ea in ætérnum, et in sǽculum sǽculi: præcéptum pósuit, et non præteríbit.|建定列品永永無窮世，施令而不越。請讚主於地：蛟龍及諸淵，火雹雪氷諸風波之能，凡聽厥命者。|
+verse|Laudáte Dóminum de terra, dracónes, et omnes abýssi.|山岳與諸谷，結實之木與凡則獨鹿樹。|
+verse|Ignis, grando, nix, glácies, spíritus procellárum: quæ fáciunt verbum ejus: Montes, et omnes colles: ligna fructífera, et omnes cedri.|禽獸與諸畜牲，迤行與衆羽。|
+verse|Béstiæ, et univérsa pécora: serpéntes, et vólucres pennátæ: Reges terræ, et omnes pópuli: príncipes, et omnes júdices terræ.|世王與蒼生長帥，及凡聽讞者。|
+verse|Júvenes, et vírgines: senes cum junióribus laudent nomen Dómini: quia exaltátum est nomen ejus solíus.|青年與衆童女，耄耋與幼稚者。|
+verse|Conféssio ejus super cælum et terram: et exaltávit cornu pópuli sui.|請頌主名。|
+verse|Hymnus ómnibus sanctis ejus: fíliis Israël, pópulo appropinquánti sibi.|盖獨一主名巍巍，聲施上天下地。而主亦顯厥民之榮，主之諸聖宜咏頌，義撒厄爾衆子及近主之民。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

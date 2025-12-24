@@ -1,0 +1,9 @@
+psalmtitle|Ps 126. Nisi Dominus|圣咏第126首|
+dropcap|Nisi Dóminus ædificáverit domum, in vanum laboravérunt qui ædíficant eam.|主非築室，築室者徒勞矣。|
+verse|Nisi Dóminus custodíerit civitátem, frustra vígilat qui custódit eam.|主非守城，守城者徒勞矣。|
+verse|Vanum est vobis ante lucem súrgere: súrgite postquam sedéritis, qui manducátis panem dolóris.|爾等天未一，嚮晨起，徒然食若力之糧。且坐而後命之起，賜攸愛者安寢。|
+verse|Cum déderit diléctis suis somnum: ecce heréditas Dómini fílii: merces, fructus ventris.|多子即是主嗣業，以腹實報答之。|
+verse|Sicut sagíttæ in manu poténtis: ita fílii excussórum.|如箭在勇者之手，是贖出之子然。|
+verse|Beátus vir, qui implévit desidérium suum ex ipsis: non confundétur cum loquétur inimícis suis in porta.|以彼滿其願，其人福哉。在城門語厥仇，將不負屈。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

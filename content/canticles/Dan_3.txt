@@ -1,0 +1,21 @@
+canticletitle|Cant. Benedicite, omnia opera|歌经·Benedicite, omnia opera|
+dropcap|Benedícite, ómnia ópera Dómini, Dómino: laudáte et superexaltáte eum in sǽcula.|天主諸受造者，請讚美主，稱頌舉揚於無窮世。|
+verse|Benedícite, Ángeli Dómini, Dómino: benedícite, cæli, Dómino.|天主神使請讚美主，在上諸天請讚美主。|
+verse|Benedícite, aquæ omnes, quæ super cælos sunt, Dómino: benedícite, omnes virtútes Dómini, Dómino.|天上諸水俱讚美主，諸天之德俱讚美主。|
+verse|Benedícite, sol et luna, Dómino: benedícite, stellæ cæli, Dómino.|太陽太陰俱讚美主，星辰宿度俱讚美主。|
+verse|Benedícite, omnis imber et ros, Dómino: benedícite, omnes spíritus Dei, Dómino.|空中雨露俱讚美主，諸品天神俱讚美主。|
+verse|Benedícite, ignis et æstus, Dómino: benedícite, frigus et æstus, Dómino.|火也暑也俱讚美主，寒也熱也俱讚美主。|
+verse|Benedícite, rores et pruína, Dómino: benedícite, gelu et frigus, Dómino.|露也霜也俱讚美主，凍也冷也俱讚美主。|
+verse|Benedícite, glácies et nives, Dómino: benedícite, noctes et dies, Dómino.|氷也雪也俱讚美主，晝也夜也俱讚美主。|
+verse|Benedícite, lux et ténebræ, Dómino: benedícite, fúlgura et nubes, Dómino.|光也暗也俱讚美主，閃電繁雲俱讚美主。|
+verse|Benedícat terra Dóminum: laudet et superexáltet eum in sǽcula.|廣輿全球請讚美主，稱頌舉揚於無窮世。|
+verse|Benedícite, montes et colles, Dómino: benedícite, univérsa germinántia in terra, Dómino.|山岳丘陵俱讚美主，坤載廣生俱讚美主。|
+verse|Benedícite, fontes, Dómino: benedícite, mária et flúmina, Dómino.|流泉衆派俱讚美主，環海江河俱讚美主。|
+verse|Benedícite, cete, et ómnia, quæ movéntur in aquis, Dómino: benedícite, omnes vólucres cæli, Dómino.|巨鰓細鱗俱讚美主，空中羽毛俱讚美主。|
+verse|Benedícite, omnes béstiæ et pécora, Dómino: benedícite, fílii hóminum, Dómino.|畜牲禽獸俱讚美主，黔首蒼生俱讚美主。|
+verse|Benedícat Israël Dóminum: laudet et superexáltet eum in sǽcula.|義撒國人俱讚美主，稱頌舉揚於無窮世。|
+verse|Benedícite, sacerdótes Dómini, Dómino: benedícite, servi Dómini, Dómino.|主之鐸德俱讚美主，主之役輩俱讚美主。|
+verse|Benedícite, spíritus, et ánimæ justórum, Dómino: benedícite, sancti, et húmiles corde, Dómino.|義人之靈神俱讚美主，諸聖及謙德者俱讚美主。|
+verse|Benedícite, Ananía, Azaría, Mísaël, Dómino: laudáte et superexaltáte eum in sǽcula.|亞納尼亞、啞理亞、彌颯厄爾俱讚美主，稱頌舉揚於無窮世。|
+verse|Benedicámus Patrem et Fílium cum Sancto Spíritu: laudémus et superexaltémus eum in sǽcula.|請衆同讚父子聖神，稱頌舉揚於無窮世。|
+verse|Benedíctus es, Dómine, in firmaménto cæli: et laudábilis, et gloriósus, et superexaltátus in sǽcula.|主於穩定天為殊福，及當讚美，及光榮舉揚於無窮世。|

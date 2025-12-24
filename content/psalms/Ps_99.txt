@@ -1,0 +1,8 @@
+psalmtitle|Ps 99. Jubilate Deo|圣咏第99首|
+dropcap|Jubiláte Deo, omnis terra: servíte Dómino in lætítia.|遍地宜踴躍而歡慶，奉事主。|
+verse|Introíte in conspéctu ejus, in exsultatióne.|請踴躍進臺前，宜知主真天主。|
+verse|Scitóte quóniam Dóminus ipse est Deus: ipse fecit nos, et non ipsi nos.|造我等，非我等自造。厥民且所牧之羊。|
+verse|Pópulus ejus, et oves páscuæ ejus: ‡ introíte portas ejus in confessióne, átria ejus in hymnis: confitémini illi.|極頌而進厥門，至於廊廡。|
+verse|Laudáte nomen ejus: quóniam suávis est Dóminus, in ætérnum misericórdia ejus, et usque in generatiónem et generatiónem véritas ejus.|奏聖詠而稱頌之，稱頌主名。盖主怡哉，厥慈永永，而厥真實無窮世。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

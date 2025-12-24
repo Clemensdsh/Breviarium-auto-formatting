@@ -1,0 +1,23 @@
+psalmtitle|Ps 33. Benedicam Dominum|圣咏第33首|
+dropcap|Benedícam Dóminum in omni témpore: semper laus ejus in ore meo.|予時時將讚美主，厥稱頌卒世於予口。|
+verse|In Dómino laudábitur ánima mea: áudiant mansuéti, et læténtur.|予心惟譽於主，良善者請聽而忻樂。|
+verse|Magnificáte Dóminum mecum: et exaltémus nomen ejus in idípsum.|偕吾丕顯主，和賡舉揚厥名。|
+verse|Exquisívi Dóminum, et exaudívit me: et ex ómnibus tribulatiónibus meis erípuit me.|予已覔主，即俯聽之，救我於諸逆。|
+verse|Accédite ad eum, et illuminámini: et fácies vestræ non confundéntur.|汝等近主而受其照，爾容將無赧。|
+verse|Iste pauper clamávit, et Dóminus exaudívit eum: et de ómnibus tribulatiónibus ejus salvávit eum.|斯貧者呼號，主俯聽伊救伊於諸窘蹙。|
+verse|Immíttet Ángelus Dómini in circúitu timéntium eum: et erípiet eos.|主將遣天神圍畏主者，且拯拔請試觀之。|
+verse|Gustáte, et vidéte quóniam suávis est Dóminus: beátus vir, qui sperat in eo.|主乃飴望主者，真福人哉。|
+verse|Timéte Dóminum, omnes sancti ejus: quóniam non est inópia timéntibus eum.|厥聖咸畏主，畏主無所乏。|
+verse|Dívites eguérunt et esuriérunt: inquiréntes autem Dóminum non minuéntur omni bono.|富人乏且饑矣，覔主者諸美無少減。|
+verse|Veníte, fílii, audíte me: timórem Dómini docébo vos.|吾子即近即聽，予將教爾以畏主。|
+verse|Quis est homo qui vult vitam: díligit dies vidére bonos? Próhibe linguam tuam a malo: et lábia tua ne loquántur dolum.|疇冀生命且欲觀善日乎？戒爾舌於惡，爾唇勿出詭言。|
+verse|Divérte a malo, et fac bonum: inquíre pacem, et perséquere eam. Óculi Dómini super justos: et aures ejus in preces eórum.|避惡趨善，覔和平而速赴之。|
+verse|Vultus autem Dómini super faciéntes mala: ut perdat de terra memóriam eórum.|主目義人，厥耳於其禱。|
+verse|Clamavérunt justi, et Dóminus exaudívit eos: et ex ómnibus tribulatiónibus eórum liberávit eos.|主視行惡，削厥名於地。|
+verse|Juxta est Dóminus iis, qui tribuláto sunt corde: et húmiles spíritu salvábit.|義輩若籲主，即俯聽之，拯於諸患。|
+verse|Multæ tribulatiónes justórum: et de ómnibus his liberábit eos Dóminus.|主邇困鬱者，埀祐神謙者。|
+verse|Custódit Dóminus ómnia ossa eórum: unum ex his non conterétur.|義人之難甚衆，主即施救焉。|
+verse|Mors peccatórum péssima: et qui odérunt justum, delínquent.|保存厥骸骨，無一殘害。|
+verse|Rédimet Dóminus ánimas servórum suórum: et non delínquent omnes qui sperant in eo.|罪人之死甚凶，凡惡義人者殆哉。主拯救衆僕之命，凡望伊者將不犯義。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

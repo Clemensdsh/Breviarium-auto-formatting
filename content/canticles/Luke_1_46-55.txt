@@ -1,0 +1,12 @@
+canticletitle|Cant. Magnificat|歌经·Magnificat|
+dropcap|Magníficat ánima mea Dóminum: et exsultávit spíritus meus in Deo salutári meo.|感頌吾主吾神，無任忻愉於救我者。|
+verse|Quia respéxit humilitátem ancíllæ suæ: ecce enim ex hoc beátam me dicent omnes generatiónes.|感頌吾主吾神，無任忻愉於救我者。|
+verse|Quia fecit mihi magna qui potens est: et sanctum nomen ejus.|緣其垂顧婢子之微，後人亦將於我乎讚頌矣。|
+verse|Et misericórdia ejus a progénie in progénies timéntibus eum.|夫全能者大展厥德於我，錫以異恩用彰聖名。|
+verse|Fecit poténtiam in bráchio suo: dispérsit supérbos mente cordis sui.|仁慈無量，將沿世世，於諸畏敬之者。|
+verse|Depósuit poténtes de sede, et exaltávit húmiles.|以厥臂神力顯大能，麾彼驕盈。|
+verse|Esuriéntes implévit bonis: et dívites dimísit inánes.|黜彼尊者於高位，而陟舉夫謙遜者。|
+verse|Suscépit Israël púerum suum, recordátus misericórdiæ suæ.|饑虛以福實之，飫滿以傾棄之。|
+verse|Sicut locútus est ad patres nostros, Abraham et sémini ejus in sǽcula.|且不忘大慈，賜以其子，以踐所許於吾祖亞罷郎，及亞罷即後世世之子孫者。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

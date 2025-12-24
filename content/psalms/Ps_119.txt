@@ -1,0 +1,8 @@
+psalmtitle|Ps 119. Ad Dominum|圣咏第119首|
+dropcap|Ad Dóminum cum tribulárer clamávi: et exaudívit me.|困鬱時予呼號主，即俯聽我。|
+verse|Dómine, líbera ánimam meam a lábiis iníquis, et a lingua dolósa.|主救我于惡唇，及于詭舌。|
+verse|Quid detur tibi, aut quid apponátur tibi ad linguam dolósam? Sagíttæ poténtis acútæ, cum carbónibus desolatóriis.|爾有何應，或何報于詭舌？勇能之利箭，偕散滅于火炭。|
+verse|Heu mihi, quia incolátus meus prolongátus est: habitávi cum habitántibus Cedar: multum íncola fuit ánima mea.|嗚呼予徙居延久，予偕則達爾寓者已寓。|
+verse|Cum his, qui odérunt pacem, eram pacíficus: cum loquébar illis, impugnábant me gratis.|予靈多旅於惡和平，予則和睦。與伊等語，彼無故逆我。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

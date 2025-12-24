@@ -1,0 +1,18 @@
+psalmtitle|Ps 5. Verba mea auribus|圣咏第5首|
+dropcap|Verba mea áuribus pércipe, Dómine, * intéllege clamórem meum.|望主聽予語，達予呼號。|2
+verse|Inténde voci oratiónis meæ, * Rex meus et Deus meus.|專於予祈禱之聲，吾王吾天主。|3
+verse|Quóniam ad te orábo: * Dómine, mane exáudies vocem meam.|向主將祈求，主晨光俯聽我禱。|4
+verse|Mane astábo tibi et vidébo: * quóniam non Deus volens iniquitátem tu es.|微明予侍爾前以觀爾，乃不愛無義者天主。|5
+verse|Neque habitábit juxta te malígnus: * neque permanébunt injústi ante óculos tuos.|惡人將不邇主，又不義者將弗克久存爾目前。|6
+verse|Odísti omnes, qui operántur iniquitátem: * perdes omnes, qui loquúntur mendácium.|主惡諸行不義，滅散諸誣言者。|7a
+verse|Virum sánguinum et dolósum abominábitur Dóminus: * (8a) ego autem in multitúdine misericórdiæ tuæ.|主憎嗜殺者并奸詭人。|7b
+verse|Introíbo in domum tuam: * adorábo ad templum sanctum tuum in timóre tuo.|予則子爾多慈，將進厥宮。|8b
+verse|Dómine, deduc me in justítia tua: * propter inimícos meos dírige in conspéctu tuo viam meam.|以畏主之心拜伏主聖殿。|9
+verse|Quóniam non est in ore eórum véritas: * cor eórum vanum est.|主導我以爾義，因予仇直指予道爾前。|10
+verse|Sepúlcrum patens est guttur eórum, † linguis suis dolóse agébant, * júdica illos, Deus.|蓋厥舌無真實，厥心浮虛，厥喉乃裂塚。|11a
+verse|Décidant a cogitatiónibus suis, † secúndum multitúdinem impietátum eórum expélle eos, * quóniam irritavérunt te, Dómine.|以厥舌行詭天主判彼，願彼虛負其想，緣多惡逐伊等，蓋激動爾怒。|11b
+verse|Et læténtur omnes, qui sperant in te, * in ætérnum exsultábunt: et habitábis in eis.|願凡望主者忻樂永世踴躍。|12a
+verse|Et gloriabúntur in te omnes, qui díligunt nomen tuum, * (13a) quóniam tu benedíces justo.|主將居於伊，凡愛主名將光榮。|12b
+verse|Dómine, ut scuto bonæ voluntátis tuæ * coronásti nos.|蓋爾降福於義者，主爾以善願之禦牌已圍我等。|13b
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

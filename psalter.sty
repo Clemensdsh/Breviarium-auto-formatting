@@ -1,0 +1,803 @@
+\ProvidesPackage{psalter}[2025/12/22 Psalter Style for Roman Breviary - Fixed v2]
+
+% ==================================================
+% 1. 页面布局
+% ==================================================
+\RequirePackage{geometry}
+\geometry{
+    paper=a5paper,
+    top=2.0cm,
+    bottom=1.8cm,
+    left=1.2cm,
+    right=1.2cm,
+    headheight=22pt,
+    headsep=0.5cm,
+    footskip=0.8cm
+}
+
+% ==================================================
+% 2. 字体配置
+% ==================================================
+\RequirePackage{fontspec}
+
+\setmainfont{Times New Roman}[Ligatures=TeX, Scale=1.0]
+\setCJKmainfont{SimSun}[AutoFakeBold=true, AutoFakeSlant=true]
+\setCJKfamilyfont{song}{SimSun}[AutoFakeBold=true, AutoFakeSlant=true]
+\providecommand{\songti}{\CJKfamily{song}}
+
+% ==================================================
+% 3. 宏包加载
+% ==================================================
+\RequirePackage{xcolor}
+\RequirePackage{ragged2e}
+\RequirePackage{paracol}
+\RequirePackage{fancyhdr}
+\RequirePackage{titlesec}
+\RequirePackage{etoolbox}
+\RequirePackage{xstring}
+\RequirePackage{ifthen}
+\RequirePackage{calc}
+\RequirePackage{graphicx}
+
+% ==================================================
+% 4. 颜色定义
+% ==================================================
+\definecolor{rubricred}{RGB}{180, 0, 0}
+\definecolor{psalmblack}{RGB}{0, 0, 0}
+
+% ==================================================
+% 5. 全局排版参数 - 左对齐
+% ==================================================
+\sloppy
+\tolerance=3000
+\emergencystretch=3em
+
+\newcommand{\GlobalFontSettings}{%
+    \fontsize{10pt}{12.5pt}\selectfont%
+    \setlength{\parskip}{0pt}%
+    \setlength{\lineskip}{0pt}%
+    \setlength{\parindent}{0pt}%
+}
+
+\newcommand{\SetLatinStyle}{%
+    \rmfamily%
+    \RaggedRight%
+    \hyphenpenalty=50%
+    \GlobalFontSettings%
+}
+
+\newcommand{\SetChineseStyle}{%
+    \songti%
+    \RaggedRight%
+    \GlobalFontSettings%
+}
+
+% ==================================================
+% 6. 分栏设置
+% ==================================================
+\setlength{\columnsep}{0.8cm}
+\setlength{\columnseprule}{0.4pt}
+\colseprulecolor{black}
+
+% ==================================================
+% 7. 计算双栏总宽度（用于图片）
+% ==================================================
+\newlength{\psTotalTextWidth}
+\setlength{\psTotalTextWidth}{\textwidth}
+
+% ==================================================
+% 8. 页眉设置 (修复版)
+% ==================================================
+
+% 1. 初始化全局变量 (只定义一次)
+\newcommand{\psCurrentHeaderStr}{} 
+
+% 2. 启用 fancyhdr 并清除默认设置
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% 3. 定义一个通用配置命令 (读取全局变量)
+\newcommand{\ApplyFancySettings}{%
+    \fancyhf{}%
+    \fancyhead[LE]{\small\thepage}%
+    \fancyhead[CE]{\small\textcolor{rubricred}{\psCurrentHeaderStr}}%
+    \fancyhead[RO]{\small\thepage}%
+    \fancyhead[CO]{\small\textcolor{rubricred}{\psCurrentHeaderStr}}%
+    \renewcommand{\headrulewidth}{0.4pt}%
+}
+
+% 4. 将通用配置应用到所有正文样式
+% 【修复】必须定义 frontmatter，否则 main.tex 会报错
+\fancypagestyle{frontmatter}{\ApplyFancySettings}
+\fancypagestyle{mainmatter}{\ApplyFancySettings}
+\fancypagestyle{fancy}{\ApplyFancySettings}
+
+% 5. 定义纯白页样式 (Plain)
+\fancypagestyle{plain}{%
+    \fancyhf{}%
+    \renewcommand{\headrulewidth}{0pt}%
+}
+
+% 6. 定义目录样式 (Tocstyle) - 硬编码文字
+\fancypagestyle{tocstyle}{%
+    \fancyhf{}%
+    \renewcommand{\headrulewidth}{0.4pt}%
+    \fancyhead[LE]{\small\thepage}%
+    \fancyhead[CE]{\small Index -- 目录}% <--- 只有这里显示 "目录"
+    \fancyhead[RO]{\small\thepage}%
+    \fancyhead[CO]{\small Index -- 目录}%
+}
+
+% 7. 【漏掉的关键部分】重新定义 fancy 样式
+% 这一步是为了防止从目录(tocstyle)切回正文(fancy)时，页眉设置丢失
+\fancypagestyle{fancy}{%
+    \fancyhf{}%
+    \renewcommand{\headrulewidth}{0.4pt}%
+    \fancyhead[LE]{\small\thepage}%
+    \fancyhead[CE]{\small\textcolor{rubricred}{\psCurrentHeaderStr}}%
+    \fancyhead[RO]{\small\thepage}%
+    \fancyhead[CO]{\small\textcolor{rubricred}{\psCurrentHeaderStr}}%
+}
+
+% ==================================================
+% 9. 设置页眉命令 - 【核心修复：强制全局更新】
+% ==================================================
+\newcommand{\psSetHeaderTitle}[2]{%
+    \markboth{#1 -- #2}{#1 -- #2}%
+    \gdef\psCurrentHeaderStr{#1 -- #2}% <--- 这一句必须有！
+}
+
+% ==================================================
+% 10. 目录文件写入系统
+% ==================================================
+\newwrite\tocLatinFile
+\newwrite\tocChineseFile
+\newcounter{psTocLabelCounter}
+\setcounter{psTocLabelCounter}{0}
+
+\newcommand{\psInitTocFiles}{%
+    \immediate\openout\tocLatinFile=\jobname-toc-latin.tmp%
+    \immediate\openout\tocChineseFile=\jobname-toc-chinese.tmp%
+}
+
+\newcommand{\psCloseTocFiles}{%
+    \immediate\closeout\tocLatinFile%
+    \immediate\closeout\tocChineseFile%
+}
+
+\newcommand{\psWriteTocEntry}[4]{%
+    \ifnum#1=1%
+        \immediate\write\tocLatinFile{\noexpand\psTocSectionEntry{#2}{#4}}%
+        \immediate\write\tocChineseFile{\noexpand\psTocSectionEntry{#3}{#4}}%
+    \else%
+        \immediate\write\tocLatinFile{\noexpand\psTocSubsectionEntry{#2}{#4}}%
+        \immediate\write\tocChineseFile{\noexpand\psTocSubsectionEntry{#3}{#4}}%
+    \fi%
+}
+
+\newcommand{\psTocSectionEntry}[2]{%
+    \noindent\textbf{#1}\dotfill\pageref{#2}\par\vspace{0.2em}%
+}
+
+\newcommand{\psTocSubsectionEntry}[2]{%
+    \noindent\hspace{1.5em}#1\dotfill\pageref{#2}\par\vspace{0.1em}%
+}
+
+\newcommand{\psPrintToc}{%
+    \psCloseTocFiles%
+    \clearpage%
+    % 1. 进入目录：切换到专用样式
+    \pagestyle{tocstyle}% 
+    {\centering\Large\bfseries Index -- 目录\par}%
+    \vspace{1em}%
+    \begin{paracol}{2}%
+        \switchcolumn[0]%
+        \InputIfFileExists{\jobname-toc-latin.tmp}{}{}%
+        \switchcolumn[1]%
+        \InputIfFileExists{\jobname-toc-chinese.tmp}{}{}%
+    \end{paracol}%
+    \clearpage%
+    % 2. 离开目录：强制切回正文样式 (读取变量)
+    \pagestyle{fancy}% 
+}
+
+% ==================================================
+% 11. 居中格式辅助
+% ==================================================
+\newcommand{\CenterBox}[1]{%
+    \noindent\begin{minipage}[c]{\linewidth}\centering #1\end{minipage}\par%
+}
+
+% ==================================================
+% 12. 首字母下沉 (用于Capitulum)
+% ==================================================
+\newlength{\dropcapwidth}
+
+\def\dropcapLatinHelper#1#2\relax{%
+    \settowidth{\dropcapwidth}{\fontsize{20pt}{20pt}\selectfont\textbf{#1}}%
+    \leavevmode\makebox[0pt][l]{\raisebox{-0.25em}{\fontsize{20pt}{20pt}\selectfont\textcolor{rubricred}{\textbf{#1}}}}%
+    \hspace{\dropcapwidth}\hspace{0.08em}#2%
+}
+
+\def\dropcapChineseHelper#1#2\relax{#1#2}
+
+% 用于Collect的首单词标红（首字母大号+其余部分标红）
+\def\dropcapCollectHelper#1#2\relax{%
+    \settowidth{\dropcapwidth}{\fontsize{20pt}{20pt}\selectfont\textbf{#1}}%
+    \leavevmode\makebox[0pt][l]{\raisebox{-0.25em}{\fontsize{20pt}{20pt}\selectfont\textcolor{rubricred}{\textbf{#1}}}}%
+    \hspace{\dropcapwidth}\hspace{0.08em}\textcolor{rubricred}{\textbf{#2}}~%
+}
+
+\newcommand{\psCollectFirstWord}[1]{%
+    \StrBefore{#1}{ }[\firstword]%
+    \StrBehind{#1}{ }[\restwords]%
+    \expandafter\dropcapCollectHelper\firstword\relax\restwords%
+}
+
+% ==================================================
+% 13. 分隔线命令
+% ==================================================
+\newcommand{\psThickRule}{%
+    \switchcolumn*%
+    \switchcolumn[0]\noindent\rule{\linewidth}{1.2pt}\par\vspace{0.3em}%
+    \switchcolumn[1]\noindent\rule{\linewidth}{1.2pt}\par\vspace{0.3em}%
+}
+
+\newcommand{\psThinRule}{%
+    \switchcolumn*%
+    \switchcolumn[0]\vspace{0.3em}\noindent\rule{\linewidth}{0.4pt}\par\vspace{0.3em}%
+    \switchcolumn[1]\vspace{0.3em}\noindent\rule{\linewidth}{0.4pt}\par\vspace{0.3em}%
+}
+
+% ==================================================
+% 14. 分页命令
+% ==================================================
+\newcommand{\psPageBreak}{%
+    \end{paracol}\clearpage\begin{paracol}{2}%
+}
+
+% ==================================================
+% 15. 标题格式
+% ==================================================
+% h1 - 不入目录，不设置页眉
+\newcommand{\psHeaderOne}[2]{%
+    \psThickRule%
+    \switchcolumn*%
+    \switchcolumn[0]\CenterBox{\Large\textbf{#1}}%
+    \switchcolumn[1]\CenterBox{\Large\textbf{#2}}%
+    \vspace{0.6em}%
+}
+
+% h1cap - 入目录为section，设置页眉
+\newcommand{\psHeaderOneCap}[2]{%
+    \stepcounter{psTocLabelCounter}%
+    \edef\currentTocLabel{pstoclabel\thepsTocLabelCounter}%
+    \psThickRule%
+    % 【关键修改】在分栏开始前设置页眉，确保生效
+    \psSetHeaderTitle{#1}{#2}% 
+    \switchcolumn*%
+    % 排版 + 埋锚点
+    \switchcolumn[0]\CenterBox{\Large\textbf{#1}}\expandafter\label\expandafter{\currentTocLabel}%
+    \switchcolumn[1]\CenterBox{\Large\textbf{#2}}%
+    \vspace{0.6em}%
+    % 【关键修改】写入目录
+    \psWriteTocEntry{1}{#1}{#2}{\currentTocLabel}%
+}
+
+% h1lowercase - 入目录为subsection，设置页眉
+\newcommand{\psHeaderOneLowercase}[2]{%
+    \stepcounter{psTocLabelCounter}%
+    \edef\currentTocLabel{pstoclabel\thepsTocLabelCounter}%
+    \psThickRule%
+    % 在分栏前设置页眉
+    \psSetHeaderTitle{#1}{#2}%
+    \switchcolumn*%
+    \switchcolumn[0]\CenterBox{\Large\textbf{#1}}\expandafter\label\expandafter{\currentTocLabel}%
+    \switchcolumn[1]\CenterBox{\Large\textbf{#2}}%
+    \vspace{0.6em}%
+    % 写入目录
+    \psWriteTocEntry{2}{#1}{#2}{\currentTocLabel}%
+}
+
+% h2 - 副标题
+\newcommand{\psHeaderTwo}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\CenterBox{\normalsize\textit{#1}}%
+    \switchcolumn[1]\CenterBox{\normalsize\textit{#2}}%
+    \vspace{0.4em}%
+}
+
+% h3 - 节次标题
+\newcommand{\psHeaderThree}[2]{%
+    \switchcolumn*%
+    \vspace{0.3em}%
+    \switchcolumn[0]\CenterBox{\normalsize\textbf{#1}}%
+    \switchcolumn[1]\CenterBox{\normalsize\textbf{#2}}%
+    \vspace{0.5em}%
+}
+
+% lesson - 读经标题（红色斜体）
+\newcommand{\psLesson}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\textcolor{rubricred}{\itshape #1}%
+    \switchcolumn[1]\textcolor{rubricred}{\textit{#2}}%
+    \vspace{0.3em}%
+}
+
+% 圣咏标题
+\newcommand{\psPsalmTitle}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\CenterBox{\small\textcolor{rubricred}{\textit{#1}}}%
+    \switchcolumn[1]\CenterBox{\small\textcolor{rubricred}{\textit{#2}}}%
+    \vspace{0.3em}%
+}
+
+% ==================================================
+% 16. 对经格式
+% ==================================================
+\newcommand{\psAntiphon}[3]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\textcolor{rubricred}{\textit{#1}}~#2%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut\textcolor{rubricred}{\textit{#1}}~#3%
+    \vspace{0.35em}%
+}
+
+\newcommand{\psAntiphonRepeat}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\textcolor{rubricred}{\textit{Ant.}}~#1%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut\textcolor{rubricred}{\textit{对经}}~#2%
+    \vspace{0.35em}%
+}
+
+\newcommand{\psAntiphonNum}[3]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\textcolor{rubricred}{\textit{Ant~#1.}}~#2%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut\textcolor{rubricred}{\textit{对经\psChineseNum{#1}}}~#3%
+    \vspace{0.35em}%
+}
+
+\newcommand{\psChineseNum}[1]{%
+    \ifnum#1=1 一\else\ifnum#1=2 二\else\ifnum#1=3 三\else\ifnum#1=4 四\else%
+    \ifnum#1=5 五\else\ifnum#1=6 六\else\ifnum#1=7 七\else\ifnum#1=8 八\else%
+    \ifnum#1=9 九\else\ifnum#1=10 十\else#1\fi\fi\fi\fi\fi\fi\fi\fi\fi\fi%
+}
+
+% ==================================================
+% 17. 圣咏诗节格式
+% ==================================================
+\newcommand{\psVerseDropcap}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\expandafter\dropcapLatinHelper#1\relax%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut\expandafter\dropcapChineseHelper#2\relax%
+    \vspace{0.4em}%
+}
+
+\newcommand{\psVerse}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut #1%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut #2%
+    \vspace{0.35em}%
+}
+
+\newcommand{\psVerseBreak}[4]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut #1~\textcolor{rubricred}{*}\\#2%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut #3\\#4%
+    \vspace{0.35em}%
+}
+
+\newcommand{\psVerseDropcapBreak}[4]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\expandafter\dropcapLatinHelper#1\relax~\textcolor{rubricred}{*}\\#2%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut\expandafter\dropcapChineseHelper#3\relax\\#4%
+    \vspace{0.4em}%
+}
+
+% ==================================================
+% 18. 礼仪指示
+% ==================================================
+\newcommand{\psRubric}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\noindent\textcolor{rubricred}{\itshape #1}%
+    \switchcolumn[1]\noindent\textcolor{rubricred}{\textit{#2}}%
+    \vspace{0.3em}%
+}
+
+\newcommand{\psRubricSingle}[1]{%
+    \switchcolumn*%
+    \switchcolumn[0]\noindent\textcolor{rubricred}{\itshape #1}%
+    \switchcolumn[1]~%
+    \vspace{0.3em}%
+}
+
+% ==================================================
+% 19. 短读经
+% ==================================================
+\newcommand{\psCapitHeader}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\CenterBox{\small\textcolor{rubricred}{\textit{#1}}}%
+    \switchcolumn[1]\CenterBox{\small\textcolor{rubricred}{\textit{#2}}}%
+    \vspace{0.3em}%
+}
+
+\newcommand{\psCapit}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\expandafter\dropcapLatinHelper#1\relax%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut\expandafter\dropcapChineseHelper#2\relax%
+    \vspace{0.35em}%
+}
+
+\newcommand{\psVR}[3]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\textcolor{rubricred}{\textbf{#1\kern-0.1em\textsl{/}\kern-0.05em.}}~#2%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut%
+        \ifthenelse{\equal{#1}{V}}{\textcolor{rubricred}{\textbf{启：}}#3}{\textcolor{rubricred}{\textbf{应：}}#3}%
+    \vspace{0.25em}%
+}
+
+\newcommand{\psScriptureRef}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\hfill\small\textcolor{rubricred}{\textit{#1}}%
+    \switchcolumn[1]\hfill\small\textcolor{rubricred}{\textit{#2}}%
+    \vspace{0.2em}%
+}
+
+% ==================================================
+% 20. 赞美诗
+% ==================================================
+\newcommand{\psHymnHeader}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\CenterBox{\small\textcolor{rubricred}{\textbf{#1}}}%
+    \switchcolumn[1]\CenterBox{\small\textcolor{rubricred}{\textbf{#2}}}%
+    \vspace{0.3em}%
+}
+
+\newcommand{\psHymnStanza}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut #1%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut #2%
+    \vspace{0.4em}%
+}
+
+\newcommand{\psHymnTitle}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\CenterBox{\small\textcolor{rubricred}{\textit{#1}}}%
+    \switchcolumn[1]\CenterBox{\small\textcolor{rubricred}{\textit{#2}}}%
+    \vspace{0.3em}%
+}
+
+% ==================================================
+% 21. 圣歌
+% ==================================================
+\newcommand{\psCanticleTitle}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\CenterBox{\small\textcolor{rubricred}{\textit{#1}}}%
+    \switchcolumn[1]\CenterBox{\small\textcolor{rubricred}{\textit{#2}}}%
+    \vspace{0.3em}%
+}
+
+% ==================================================
+% 22. 图片 - 智能缩放
+% ==================================================
+\newlength{\psDefaultImageHeight}
+\setlength{\psDefaultImageHeight}{3.2cm}
+
+\newlength{\psImageNaturalWidth}
+\newlength{\psImageNaturalHeight}
+
+% 单栏图片
+\newcommand{\psImage}[2][]{%
+    \switchcolumn*%
+    \switchcolumn[0]%
+    \begin{center}%
+        \ifthenelse{\equal{#1}{}}%
+            {\includegraphics[height=\psDefaultImageHeight]{#2}}%
+            {\includegraphics[height=#1]{#2}}%
+    \end{center}%
+    \switchcolumn[1]~%
+    \vspace{0.3em}%
+}
+
+% 全宽图片 - 智能缩放
+\newcommand{\psImageFullWidth}[2][]{%
+    \end{paracol}%
+    \begin{center}%
+        \ifthenelse{\equal{#1}{}}%
+        {%
+            % 无高度参数：检查宽度，必要时缩放
+            \settowidth{\psImageNaturalWidth}{\includegraphics{#2}}%
+            \ifdim\psImageNaturalWidth>\psTotalTextWidth%
+                \includegraphics[width=\psTotalTextWidth]{#2}%
+            \else%
+                \includegraphics[height=\psDefaultImageHeight]{#2}%
+            \fi%
+        }%
+        {%
+            % 有高度参数：先按高度加载，再检查宽度
+            \settowidth{\psImageNaturalWidth}{\includegraphics[height=#1]{#2}}%
+            \ifdim\psImageNaturalWidth>\psTotalTextWidth%
+                \includegraphics[width=\psTotalTextWidth]{#2}%
+            \else%
+                \includegraphics[height=#1]{#2}%
+            \fi%
+        }%
+    \end{center}%
+    \begin{paracol}{2}%
+}
+
+% ==================================================
+% 23. 圣三光荣颂
+% ==================================================
+\newcommand{\psGloria}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\textit{#1}%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut\textit{#2}%
+    \vspace{0.3em}%
+}
+
+% ==================================================
+% 24. 结束祷词
+% ==================================================
+\newcommand{\psCollect}[2]{%
+    \switchcolumn*%
+    \vspace{0.2em}%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\psCollectFirstWord{#1}%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut #2%
+    \vspace{0.5em}%
+}
+
+% ==================================================
+% 25. 普通文本
+% ==================================================
+\newcommand{\psText}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut #1%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut #2%
+    \vspace{0.35em}%
+}
+
+\newcommand{\psTextIndent}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\quad #1%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut\quad #2%
+    \vspace{0.3em}%
+}
+
+% ==================================================
+% 26. 作者标注
+% ==================================================
+\newcommand{\psHymnAuthor}[2]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\hfill\small\textit{#1}%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut\hfill\small\textit{#2}%
+    \vspace{0.3em}%
+}
+
+% ==================================================
+% 27. 其他
+% ==================================================
+\newcommand{\psSeparator}{\psThinRule}
+\newcommand{\psast}{\textcolor{rubricred}{*}}
+\newcommand{\pscross}{\textcolor{rubricred}{\dag}}
+\newcommand{\psdcross}{\textcolor{rubricred}{\ddag}}
+
+\newenvironment{psaltercolumns}{\begin{paracol}{2}}{\end{paracol}}
+
+\newcommand{\psVerseNum}[3]{%
+    \switchcolumn*%
+    \switchcolumn[0]\SetLatinStyle\leavevmode\strut\textcolor{rubricred}{\small #1}~#2%
+    \switchcolumn[1]\SetChineseStyle\leavevmode\strut\textcolor{rubricred}{\small #1}~#3%
+    \vspace{0.35em}%
+}
+
+% ==================================================
+% 28. 单栏模式支持
+% ==================================================
+% 单栏模式状态标志
+\newif\ifsinglecolmode
+\singlecolmodefalse
+
+% 进入单栏模式
+\newcommand{\psEnterSingleCol}{%
+    \end{paracol}%
+    \global\singlecolmodetrue%
+    \vspace{0.5em}%
+}
+
+% 退出单栏模式，恢复双栏
+\newcommand{\psExitSingleCol}{%
+    \global\singlecolmodefalse%
+    \vspace{0.5em}%
+    \begin{paracol}{2}%
+}
+
+% ==================================================
+% 29. 单栏模式下的格式命令（只使用中文/第三列内容）
+% ==================================================
+
+% 单栏标题 - h1
+\newcommand{\psSingleHeaderOne}[1]{%
+    \noindent\rule{\textwidth}{1.2pt}\par\vspace{0.3em}%
+    \begin{center}\Large\textbf{#1}\end{center}%
+    \vspace{0.6em}%
+}
+
+% 单栏标题 - h1cap
+\newcommand{\psSingleHeaderOneCap}[2]{%
+    \stepcounter{psTocLabelCounter}%
+    \edef\currentTocLabel{pstoclabel\thepsTocLabelCounter}%
+    \noindent\rule{\textwidth}{1.2pt}\par\vspace{0.3em}%
+    \begin{center}\Large\textbf{#2}\expandafter\label\expandafter{\currentTocLabel}\end{center}%
+    % 设置页眉
+    \psSetHeaderTitle{#1}{#2}%
+    \vspace{0.6em}%
+    % 写入目录
+    \psWriteTocEntry{1}{#1}{#2}{\currentTocLabel}%
+}
+
+% 单栏标题 - h1lowercase
+\newcommand{\psSingleHeaderOneLowercase}[2]{%
+    \stepcounter{psTocLabelCounter}%
+    \edef\currentTocLabel{pstoclabel\thepsTocLabelCounter}%
+    \noindent\rule{\textwidth}{1.2pt}\par\vspace{0.3em}%
+    \begin{center}\Large\textbf{#2}\expandafter\label\expandafter{\currentTocLabel}\end{center}%
+    % 设置页眉
+    \psSetHeaderTitle{#1}{#2}%
+    \vspace{0.6em}%
+    % 写入目录
+    \psWriteTocEntry{2}{#1}{#2}{\currentTocLabel}%
+}
+
+% 单栏标题 - h2
+\newcommand{\psSingleHeaderTwo}[1]{%
+    \begin{center}\normalsize\textit{#1}\end{center}%
+    \vspace{0.4em}%
+}
+
+% 单栏标题 - h3
+\newcommand{\psSingleHeaderThree}[1]{%
+    \vspace{0.3em}%
+    \begin{center}\normalsize\textbf{#1}\end{center}%
+    \vspace{0.5em}%
+}
+
+% 单栏读经标题
+\newcommand{\psSingleLesson}[1]{%
+    \noindent\textcolor{rubricred}{\textit{#1}}%
+    \vspace{0.3em}\par%
+}
+
+% 单栏圣咏标题
+\newcommand{\psSinglePsalmTitle}[1]{%
+    \begin{center}\small\textcolor{rubricred}{\textit{#1}}\end{center}%
+    \vspace{0.3em}%
+}
+
+% 单栏圣歌标题
+\newcommand{\psSingleCanticleTitle}[1]{%
+    \begin{center}\small\textcolor{rubricred}{\textit{#1}}\end{center}%
+    \vspace{0.3em}%
+}
+
+% 单栏诗节（带首字下沉）
+\newcommand{\psSingleVerseDropcap}[1]{%
+    \SetChineseStyle\noindent\leavevmode\strut #1%
+    \vspace{0.4em}\par%
+}
+
+% 单栏诗节
+\newcommand{\psSingleVerse}[1]{%
+    \SetChineseStyle\noindent\leavevmode\strut #1%
+    \vspace{0.35em}\par%
+}
+
+% 单栏光荣颂
+\newcommand{\psSingleGloria}[1]{%
+    \SetChineseStyle\noindent\leavevmode\strut\textit{#1}%
+    \vspace{0.3em}\par%
+}
+
+% 单栏对经
+\newcommand{\psSingleAntiphon}[1]{%
+    \SetChineseStyle\noindent\leavevmode\strut\textcolor{rubricred}{\textit{对经}}~#1%
+    \vspace{0.35em}\par%
+}
+
+% 单栏对经（带编号）
+\newcommand{\psSingleAntiphonNum}[2]{%
+    \SetChineseStyle\noindent\leavevmode\strut\textcolor{rubricred}{\textit{对经\psChineseNum{#1}}}~#2%
+    \vspace{0.35em}\par%
+}
+
+% 单栏礼仪指示
+\newcommand{\psSingleRubric}[1]{%
+    \noindent\textcolor{rubricred}{\textit{#1}}%
+    \vspace{0.3em}\par%
+}
+
+% 单栏启应
+\newcommand{\psSingleVR}[2]{%
+    \SetChineseStyle\noindent\leavevmode\strut%
+    \ifthenelse{\equal{#1}{V}}{\textcolor{rubricred}{\textbf{启：}}#2}{\textcolor{rubricred}{\textbf{应：}}#2}%
+    \vspace{0.25em}\par%
+}
+
+% 单栏赞美诗节
+\newcommand{\psSingleHymnStanza}[1]{%
+    \SetChineseStyle\noindent\leavevmode\strut #1%
+    \vspace{0.4em}\par%
+}
+
+% 单栏赞美诗标题
+\newcommand{\psSingleHymnTitle}[1]{%
+    \begin{center}\small\textcolor{rubricred}{\textit{#1}}\end{center}%
+    \vspace{0.3em}%
+}
+
+% 单栏赞美诗头部
+\newcommand{\psSingleHymnHeader}[1]{%
+    \begin{center}\small\textcolor{rubricred}{\textbf{#1}}\end{center}%
+    \vspace{0.3em}%
+}
+
+% 单栏短读经（Capit）
+\newcommand{\psSingleCapit}[1]{%
+    \SetChineseStyle\noindent\leavevmode\strut #1%
+    \vspace{0.35em}\par%
+}
+
+% 单栏短读经头部
+\newcommand{\psSingleCapitHeader}[1]{%
+    \begin{center}\small\textcolor{rubricred}{\textit{#1}}\end{center}%
+    \vspace{0.3em}%
+}
+
+% 单栏经文引用
+\newcommand{\psSingleScriptureRef}[1]{%
+    \hfill\small\textcolor{rubricred}{\textit{#1}}%
+    \vspace{0.2em}\par%
+}
+
+% 单栏结束祷词
+\newcommand{\psSingleCollect}[1]{%
+    \vspace{0.2em}%
+    \SetChineseStyle\noindent\leavevmode\strut #1%
+    \vspace{0.5em}\par%
+}
+
+% 单栏普通文本
+\newcommand{\psSingleText}[1]{%
+    \SetChineseStyle\noindent\leavevmode\strut #1%
+    \vspace{0.35em}\par%
+}
+
+% 单栏分隔线
+\newcommand{\psSingleThinRule}{%
+    \vspace{0.3em}\noindent\rule{\textwidth}{0.4pt}\par\vspace{0.3em}%
+}
+
+\newcommand{\psSingleThickRule}{%
+    \noindent\rule{\textwidth}{1.2pt}\par\vspace{0.3em}%
+}
+
+% 单栏分页
+\newcommand{\psSinglePageBreak}{%
+    \clearpage%
+}
+
+% 单栏图片
+\newcommand{\psSingleImage}[1]{%
+    \begin{center}%
+        \settowidth{\psImageNaturalWidth}{\includegraphics{#1}}%
+        \ifdim\psImageNaturalWidth>\textwidth%
+            \includegraphics[width=\textwidth]{#1}%
+        \else%
+            \includegraphics[height=\psDefaultImageHeight]{#1}%
+        \fi%
+    \end{center}%
+    \vspace{0.3em}%
+}
+
+\endinput

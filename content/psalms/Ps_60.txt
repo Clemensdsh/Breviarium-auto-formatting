@@ -1,0 +1,10 @@
+psalmtitle|Ps 60. Deus, reppulisti nos, destruxisti nos|圣咏第60首|
+dropcap|Exáudi, Deus, deprecatiónem meam: inténde oratióni meæ.|天主俯聼予求，惟專於我禱。|
+verse|A fínibus terræ ad te clamávi: dum anxiarétur cor meum, in petra exaltásti me.|自遍地末境呼號爾。|
+verse|Deduxísti me, quia factus es spes mea: turris fortitúdinis a fácie inimíci.|予心因欝時，已舉我於石引導我。|
+verse|Inhabitábo in tabernáculo tuo in sǽcula: prótegar in velaménto alárum tuárum.|盖爾乃予望，拒仇之敵樓。|
+verse|Quóniam tu, Deus meus, exaudísti oratiónem meam: dedísti hereditátem timéntibus nomen tuum.|予將永居爾宫，庇護於爾翼下。|
+verse|Dies super dies regis adícies: annos ejus usque in diem generatiónis et generatiónis.|吾天主俯聼予禱，已賜嗣業於畏爾名者。|
+verse|Pérmanet in ætérnum in conspéctu Dei: misericórdiam et veritátem ejus quis requíret? Sic psalmum dicam nómini tuo in sǽculum sǽculi: ut reddam vota mea de die in diem.|將加歲月於王，厥壽至於永世。天主䑓前永存仁慈且真實，疇能究之？向主名將歌咏世世，日償其願。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

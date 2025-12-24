@@ -1,0 +1,11 @@
+psalmtitle|Ps 147. Lauda Jerusalem|圣咏第147首|
+dropcap|Lauda, Jerúsalem, Dóminum: lauda Deum tuum, Sion.|日路撒稜請讚美主，西婉讚美爾天主。|
+verse|Quóniam confortávit seras portárum tuárum: benedíxit fíliis tuis in te.|蓋已固諸門之鎖鍊，為降福于衆子居於爾中。|
+verse|Qui pósuit fines tuos pacem: et ádipe fruménti sátiat te.|置和平於爾諸界，以麥膏飽之。|
+verse|Qui emíttit elóquium suum terræ: velóciter currit sermo ejus.|其發令於地，厥令速馳。|
+verse|Qui dat nivem sicut lanam: nébulam sicut cínerem spargit.|賜雪如軟羢，散霧如灰然。|
+verse|Mittit crystállum suam sicut buccéllas: ante fáciem frígoris ejus quis sustinébit? Emíttet verbum suum, et liquefáciet ea: flabit spíritus ejus, et fluent aquæ.|降冰塊如裂餅，誰當其寒。|
+verse|Qui annúntiat verbum suum Jacob: justítias, et judícia sua Israël.|將發厥令而融之，吹氣而水則流。|
+verse|Non fecit táliter omni natióni: et judícia sua non manifestávit eis.|其啟示於雅歌伯，示義及判於義撒厄爾。從無加此於別民，而厥旨無示伊等。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

@@ -1,0 +1,34 @@
+psalmtitle|Ps 103. Benedic, anima mea, Domino, et omnia, quae intra me sunt|圣咏第103首|
+dropcap|Bénedic, ánima mea, Dómino: Dómine, Deus meus, magnificátus es veheménter.|予靈讃美主，予主予天主，爾丕顯之至。|
+verse|Confessiónem, et decórem induísti: amíctus lúmine sicut vestiménto: Exténdens cælum sicut pellem: qui tegis aquis superióra ejus.|爾色衣頌揚，及袨麗衣光耀，即為衣。|
+verse|Qui ponis nubem ascénsum tuum: qui ámbulas super pennas ventórum.|伸天體如皮，令水覆之。|
+verse|Qui facis ángelos tuos, spíritus: et minístros tuos ignem uréntem.|騰雲而上，行風羽之上。|
+verse|Qui fundásti terram super stabilitátem suam: non inclinábitur in sǽculum sǽculi.|令爾神為使者，及爾承使者炙火。|
+verse|Abýssus, sicut vestiméntum, amíctus ejus: super montes stabunt aquæ.|置地基於厥恒，永不至傾。|
+verse|Ab increpatióne tua fúgient: a voce tonítrui tui formidábunt.|淵為厥衣，水居山上。因爾命奔走，聞爾雷聲將恐怖。|
+verse|Ascéndunt montes: et descéndunt campi in locum, quem fundásti eis.|山岳處上，平原在下，惟爾置之。|
+verse|Términum posuísti, quem non transgrediéntur: neque converténtur operíre terram.|定界將不越，不復掩地。|
+verse|Qui emíttis fontes in convállibus: inter médium móntium pertransíbunt aquæ.|發泉於谷，山中流水。|
+verse|Potábunt omnes béstiæ agri: exspectábunt ónagri in siti sua.|走獸將飲，野驢渴望。|
+verse|Super ea vólucres cæli habitábunt: de médio petrárum dabunt voces.|飛禽棲於彼上，石中將饗。|
+verse|Rigans montes de superióribus suis: de fructu óperum tuórum satiábitur terra: Prodúcens fænum juméntis, et herbam servitúti hóminum: Ut edúcas panem de terra: et vinum lætíficet cor hóminis: Ut exhílaret fáciem in óleo: et panis cor hóminis confírmet.|由灌山岳以爾實工，大地飽飫。草發牧衆獸，及以育人。|
+verse|Saturabúntur ligna campi, et cedri Líbani, quas plantávit: illic pásseres nidificábunt.|由地發麫餅，酒樂人心，油恱人容，麫餅堅乎人心。|
+verse|Heródii domus dux est eórum: montes excélsi cervis: petra refúgium herináciis.|平原樹木將飽飫，已栽利把諾山則獨樂樹。|
+verse|Fecit lunam in témpora: sol cognóvit occásum suum.|飛禽巢於彼，厄落地柯為之先。|
+verse|Posuísti ténebras, et facta est nox: in ipsa pertransíbunt omnes béstiæ silvæ.|峻山居鹿，山洞刺蝟所歸。|
+verse|Cátuli leónum rugiéntes, ut rápiant, et quærant a Deo escam sibi.|太隂主時，太陽識暮。|
+verse|Ortus est sol, et congregáti sunt: et in cubílibus suis collocabúntur.|置暗而夜成，斯時野獸出行，小獅吼覔望於主厥飲食。太陽已出，百獸㑹歸本洞。|
+verse|Exíbit homo ad opus suum: et ad operatiónem suam usque ad vésperum.|人則出工作，以至夕。|
+verse|Quam magnificáta sunt ópera tua, Dómine! ómnia in sapiéntia fecísti: impléta est terra possessióne tua.|主爾制丕顯哉，因爾知造萬有，以爾制遍地盈。|
+verse|Hoc mare magnum, et spatiósum mánibus: illic reptília, quorum non est númerus.|斯海寬大，水族無量，大小各異。|
+verse|Animália pusílla cum magnis: illic naves pertransíbunt.|舟舶攸遊，亦造蟒喜悦。|
+verse|Draco iste, quem formásti ad illudéndum ei: ómnia a te exspéctant ut des illis escam in témpore.|萬有望爾常時食，爾與伊等則收。|
+verse|Dante te illis, cólligent: aperiénte te manum tuam, ómnia implebúntur bonitáte.|伸爾手皆以善滿，爾背容即皆亂。降厥氣即化，而歸于原灰。|
+verse|Averténte autem te fáciem, turbabúntur: áuferes spíritum eórum, et defícient, et in púlverem suum reverténtur.|發爾神將生活，地靣復新。|
+verse|Emíttes spíritum tuum, et creabúntur: et renovábis fáciem terræ.|主榮世世，主樂於厥制。|
+verse|Sit glória Dómini in sǽculum: lætábitur Dóminus in opéribus suis: Qui réspicit terram, et facit eam trémere: qui tangit montes, et fúmigant.|伊見地即震，摩山即發熖。|
+verse|Cantábo Dómino in vita mea: psallam Deo meo, quámdiu sum.|平生向主歌，向予天主誦咏，居世之諸曰。|
+verse|Jucúndum sit ei elóquium meum: ego vero delectábor in Dómino.|望予言恱伊，予也将樂天主。|
+verse|Defíciant peccatóres a terra, et iníqui ita ut non sint: bénedic, ánima mea, Dómino.|希罪人謝於地，而行逆者散亡。予靈讃天主。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|

@@ -1,0 +1,16 @@
+# LaTeX 编译产生的临时文件夹
+build/
+
+# LaTeX 产生的临时文件（如果不在build里）
+*.pdf
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Python 编译缓存
+__pycache__/
+
+# PyCharm 的项目配置文件夹（截图里看到你用PyCharm）
+.idea/

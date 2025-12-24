@@ -1,0 +1,37 @@
+\documentclass[a5paper,10pt,twoside]{ctexart}
+\usepackage{psalter}
+\usepackage{geometry}
+
+\begin{document}
+
+% ==================================================
+% 标题页 (已模板化)
+% ==================================================
+\pagestyle{plain}
+\begin{titlepage}
+    \centering
+    \vspace*{2.5cm}
+    % 中文大标题
+    {\fontsize{28pt}{34pt}\selectfont\bfseries %TITLE_ZH%\par}
+    \vspace{1.2cm}
+    % 拉丁文红字标题
+    {\fontsize{20pt}{24pt}\selectfont\bfseries\textcolor{rubricred}{%TITLE_LAT%\par}}
+    \vspace{2.5cm}
+    % 版本/编者信息
+    {\fontsize{14pt}{18pt}\selectfont {%EDITION_INFO%\par}}
+    \vfill
+    % 底部文字
+    {\fontsize{12pt}{16pt}\selectfont\itshape %FOOTER_TEXT%\par}
+    \vspace{1cm}
+\end{titlepage}
+
+\pagenumbering{roman}
+\pagestyle{frontmatter}
+
+% ==================================================
+% 正文部分
+% ==================================================
+
+\input{body.tex}
+
+\end{document}

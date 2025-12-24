@@ -1,0 +1,13 @@
+psalmtitle|Ps 97. Cantate Domino|圣咏第97首|
+dropcap|Cantáte Dómino cánticum novum: quia mirabília fecit.|請爾等向主奏新歌，盖厥行奇異。|
+verse|Salvávit sibi déxtera ejus: et brácchium sanctum ejus.|厥右手與膊救伊。|
+verse|Notum fecit Dóminus salutáre suum: in conspéctu géntium revelávit justítiam suam.|主已顯救世者，異教之前顯明厥義。|
+verse|Recordátus est misericórdiæ suæ, et veritátis suæ dómui Israël.|記念厥慈及其真，為依撒厄爾家。|
+verse|Vidérunt omnes términi terræ salutáre Dei nostri.|遍地末境已覩救世我等天主。|
+verse|Jubiláte Deo, omnis terra: cantáte, et exsultáte, et psállite.|請遍地向主歡慶，且歌且咏且抃舞。|
+verse|Psállite Dómino in cíthara, in cíthara et voce psalmi: in tubis ductílibus, et voce tubæ córneæ.|向主弹咏二十四弦琴，弹咏二十四弦琴，用金號與角號，吹主前。|
+verse|Jubiláte in conspéctu regis Dómini: moveátur mare, et plenitúdo ejus: orbis terrárum, et qui hábitant in eo.|熙熙寰海與其所包涵之物，寰宇與其所居者亦欣動。|
+verse|Flúmina plaudent manu, simul montes exsultábunt a conspéctu Dómini: quóniam venit judicáre terram.|江河擺手，並山岳主臺前踴躍。|
+verse|Judicábit orbem terrárum in justítia, et pópulos in æquitáte.|盖降臨審判遍地，將以義判天下，以均平萬民。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto.|光荣归于父，及子，及圣神。|
+gloria|Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|起初如何，今日亦然，直到永远。亚孟。|
