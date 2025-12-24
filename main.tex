@@ -5,26 +5,25 @@
 \begin{document}
 
 % ==================================================
-% 标题页 (已模板化)
+% 标题页
 % ==================================================
 \pagestyle{plain}
 \begin{titlepage}
     \centering
     \vspace*{2.5cm}
-    % 中文大标题
-    {\fontsize{28pt}{34pt}\selectfont\bfseries %TITLE_ZH%\par}
+    {\fontsize{28pt}{34pt}\selectfont\bfseries {羅馬大日課\\[0.5em]耶穌聖誕瞻禮}\par}
     \vspace{1.2cm}
-    % 拉丁文红字标题
-    {\fontsize{20pt}{24pt}\selectfont\bfseries\textcolor{rubricred}{%TITLE_LAT%\par}}
+    {\fontsize{20pt}{24pt}\selectfont\bfseries\textcolor{rubricred}{Breviárium Románum\\[0.5em]In Nativitáte Dómini}\par}
     \vspace{2.5cm}
-    % 版本/编者信息
-    {\fontsize{14pt}{18pt}\selectfont {%EDITION_INFO%\par}}
+    {\fontsize{14pt}{18pt}\selectfont {中拉對照\\[0.5em]Edítio Sínico-Latína}\par}
     \vfill
-    % 底部文字
-    {\fontsize{12pt}{16pt}\selectfont\itshape %FOOTER_TEXT%\par}
+    {\fontsize{12pt}{16pt}\selectfont\itshape Pro Manuscripto\par}
     \vspace{1cm}
 \end{titlepage}
 
+% ==================================================
+% 前言部分
+% ==================================================
 \pagenumbering{roman}
 \pagestyle{frontmatter}
 
@@ -32,6 +31,15 @@
 % 正文部分
 % ==================================================
 
+% 【关键修复】
+% 这里删掉了 \begin{paracol}{2}
+% 因为 body.tex 里已经包含了 \psPrintToc (自带分栏) 和 \begin{paracol} (正文分栏)
+% 如果这里再写，就会导致 "Nested paracol" 错误
+
 \input{body.tex}
+
+% 这里保留 \end{paracol}
+% 因为 body.tex 打开了分栏，我们需要在这里把它关上
+\end{paracol}
 
 \end{document}
