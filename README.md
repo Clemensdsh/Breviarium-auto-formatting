@@ -81,6 +81,6 @@ If you wish to customize the `body.tex` template or run specific modular scripts
 
 最后，感谢 **Claude** 和 **Gemini** 两位 AI 助手在代码编写与调试过程中提供的巨大帮助。
 
-Special thanks to **Brother Gabriel Renkun** for the inspiration. I also want to acknowledge **AlanL399** and his Breviary Typesetting project on GitHub. His LaTeX source text provided valuable formatting guidelines—even though I discovered it only after finishing my code (too late to refactor this time), it was remarkably insightful. It is a hidden gem that surprisingly lacks stars, check it out here: [BreviaryTypesetting](https://github.com/AlanL399/BreviaryTypesetting).
+Special thanks to **Brother Gabriel** for the inspiration. I also want to acknowledge **AlanL399** and his Breviary Typesetting project on GitHub. His LaTeX source text provided valuable formatting guidelines—even though I discovered it only after finishing my code (too late to refactor this time), it was remarkably insightful. It is a hidden gem that surprisingly lacks stars, check it out here: [BreviaryTypesetting](https://github.com/AlanL399/BreviaryTypesetting).
 
 Finally, thanks to **Claude** and **Gemini**, my AI assistants, for their immense help in coding and debugging.
