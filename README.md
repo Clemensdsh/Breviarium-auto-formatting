@@ -7,7 +7,7 @@
 
 下图是软件生成的排版效果截图示例。
 
-![排版效果预览](docs_assets/preview.png)
+![排版效果预览](docs_assets/preview.jpg)
 
 > **提示 / Tip**:
 > 图中效果对应的中间 LaTeX 代码文件已包含在仓库中examples文件夹供参考。
