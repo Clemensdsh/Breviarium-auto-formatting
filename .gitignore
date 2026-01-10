@@ -14,3 +14,4 @@ __pycache__/
 
 # PyCharm 的项目配置文件夹（截图里看到你用PyCharm）
 .idea/
+dist/BreviariumGen.exe
