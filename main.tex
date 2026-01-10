@@ -1,8 +1,24 @@
-\documentclass[a5paper,10pt,twoside]{ctexart}
+% !TEX program = lualatex
+% ============================================================
+% Psalter LaTeX Generator v3.0
+% 
+% 【重要】此文档必须使用 LuaLaTeX 编译！
+% 命令行: lualatex main.tex
+% 
+% 文档类 ltjsarticle 和宏包 luatexja 需要 LuaTeX 引擎。
+% 如果使用 XeLaTeX 或 pdfLaTeX 会报错。
+% ============================================================
+\documentclass[a5paper,10pt,twoside]{ltjsarticle}
+\usepackage{luatexja-fontspec}
 \usepackage{psalter}
 \usepackage{geometry}
 
 \begin{document}
+
+% ==================================================
+% 初始化目录文件系统
+% ==================================================
+\psInitTocFiles
 
 % ==================================================
 % 标题页 (已模板化)
@@ -15,7 +31,7 @@
     {\fontsize{28pt}{34pt}\selectfont\bfseries %TITLE_ZH%\par}
     \vspace{1.2cm}
     % 拉丁文红字标题
-    {\fontsize{20pt}{24pt}\selectfont\bfseries\textcolor{rubricred}{%TITLE_LAT%\par}}
+    {\fontsize{20pt}{24pt}\selectfont\bfseries\color{rubricred}%TITLE_LAT%\par}
     \vspace{2.5cm}
     % 版本/编者信息
     {\fontsize{14pt}{18pt}\selectfont {%EDITION_INFO%\par}}

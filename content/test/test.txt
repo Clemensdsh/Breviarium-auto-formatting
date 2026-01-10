@@ -1,0 +1,85 @@
+singlecol|||
+h1|Praefatio|序言|
+text|Hoc documentum est systema probationis. Omnes functiones et formae hic testatae sunt.|此文件為系統測試。所有功能和格式皆於此測試。|
+text|Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.|測試文本：禮儀書籍排版系統，支援拉丁文與中文雙欄對照，支援多種格式標記。|
+thickrule|||
+imprimatur|Probatio Imprimatur Systema|准印系統測試|
+singlecol|||
+tocstart|||
+h1cap|Ad Vesperas|申正經|
+h1lowercase|Feria II|瞻禮二|
+rubric|(Dícitur Pater noster et Ave María, secréto.)|默念：天主經、聖母經。(畢,明聲念:)|
+V|Deus, in adiutórium meum inténde.|天主惟專於我扶祐。|
+R|Dómine, ad adjuvándum me festína.|主速格以救助我。|
+gloria|Glória Patri, et Fílio, et Spirítui Sancto. Sicut erat in princípio, et nunc, et semper, et in sǽcula sæculórum. Amen. Allelúja.|欽頌榮福於罷德肋、及費畧、及斯彼利多三多，若今茲、若永遠、及無窮世。亞孟。亞勒路亞。|
+rule|||
+antiphon|Rex pacificus magnificatus est, cujus vultum desiderat universa terra.|和睦王已丕顯，遍地顒慕覲厥容。|
+psalmtitle|Psalmus 109|聖詠109|
+verse|Dixit Dóminus Dómino meo: * Sede a dextris meis:|主語吾主曰：爾坐予右，|
+verse|Donec ponam inimícos tuos, * scabéllum pedum tuórum.|俟予伏爾仇於爾足下。|
+verse|Virgam virtútis tuæ emíttet Dóminus ex Sion: * domináre in médio inimicórum tuórum.|主自西婉將發爾德能之鋌，爾將王爾仇之中。|
+verse|Tecum princípium in die virtútis tuæ in splendóribus sanctórum: * ex útero ante lucíferum génui te.|爾德能之日，原始偕爾諸聖之光中；啟明之先，予已胚胎生爾。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto. Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|欽頌榮福於罷德肋、及費畧、及斯彼利多三多，若今茲、若永遠、及無窮世。亞孟。|
+antiphon|Rex pacificus magnificatus est, cujus vultum desiderat universa terra.|和睦王已丕顯，遍地顒慕覲厥容。|
+thickrule|||
+rubric|Capitulum|節目|
+h3|Tit. 3:4-5|鐸三4，5|
+text|Appáruit grátia Dei Salvatóris nostri ómnibus homínibus, erúdiens nos, ut abnegántes impietátem.|吾救世天主為人者，仁慈攸顯矣，非為吾儕立義功而來，乃因厥慈救我等。|
+R|Deo grátias.|謝天主。|
+rule|||
+rubric|Hymnus|聖歌|
+hymnheader|Jesu, Redémptor ómnium|救世耶穌|
+hymn|Jesu, Redémptor ómnium, Quem lucis ante oríginem, Parem patérnæ glóriæ, Pater suprémus édidit.|救世耶穌，啟明之先，上父攸生，與已均榮。|
+hymn|Tu lumen, et splendor Patris, Tu spes perénnis ómnium: Inténde quas fundunt preces Tui per orbem sérvuli.|爾乃父光，蒼生之望，普世微僕，攸祈俯聽。|
+hymn|Meménto, rerum Cónditor, Nostri quod olim córporis, Sacráta ab alvo Vírginis Nascéndo, formam súmpseris.|肇基萬有，請記昔者，由童女胎，降取吾身。|
+hymn|Jesu, tibi sit glória, Qui natus es de Vírgine, Cum Patre et almo Spíritu, In sempitérna sǽcula. Amen.|誕於童女，耶穌永福，歸爾偕父，聖神世世。亞孟。|
+thickrule|||
+V|Notum fecit Dóminus, allelúja.|主已顯亞勒路亞。|
+R|Salutáre suum, allelúja.|厥救世者亞勒路亞。|
+rubric|Ad Magnificat|聖母歌|
+antiphon|Hódie Christus natus est: hódie Salvátor appáruit: hódie in terra canunt Ángeli.|今日基利斯督降誕，今日救世者顯。今日天神聲頌，宗使者忻樂。|
+psalmtitle|Magníficat (Luc. 1:46-55)|聖母歌|
+verse|Magníficat ánima mea Dóminum: et exsultávit spíritus meus in Deo salutári meo.|感頌吾主吾神，無任忻愉於救我者。|
+verse|Quia respéxit humilitátem ancíllæ suæ: * ecce enim ex hoc beátam me dicent omnes generatiónes.|緣其垂顧婢子之微，後人亦將於我乎讚頌矣。|
+verse|Quia fecit mihi magna, qui potens est: * et sanctum nomen ejus.|夫全能者大展厥德於我，錫以異恩用彰聖名。|
+gloria|Glória Patri, et Fílio, * et Spirítui Sancto. Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.|欽頌榮福於罷德肋、及費畧、及斯彼利多三多，若今茲、若永遠、及無窮世。亞孟。|
+antiphon|Hódie Christus natus est: hódie Salvátor appáruit.|今日基利斯督降誕，今日救世者顯。|
+rule|||
+rubric|Oratio|祝文|
+V|Dóminus vobíscum.|主與爾偕焉。|
+R|Et cum spíritu tuo.|並於爾神。|
+collect|Concéde, quǽsumus, omnípotens Deus: ut nos Unigéniti tui nova per carnem Natívitas líberet; quos sub peccáti jugo vetústa sérvitus tenet. Per eúndem Dóminum nostrum Jesum Christum Filium tuum.|懇祈全能天主，彼久在罪軛，賴爾惟一子肉身新誕，幸救脫亦。為聖子耶穌基利斯督我等主。|
+R|Amen.|亞孟。|
+thickrule|||
+h3|Commemoratio S. Stephani Protomartyris|聖斯德望首致命憶文|
+antiphon|Stéphanus autem plenus grátia et fortitúdine, faciébat prodígia et signa magna in pópulo.|斯德望充滿聖寵，以勇敢行多靈異，廣奇於衆。|
+V|Glória et honóre coronásti eum, Dómine.|主以崇福冕旒已加伊首。|
+R|Et constituísti eum super ópera mánuum tuárum.|且置伊爾手諸工上。|
+collect|Da nobis, quǽsumus, Dómine, imitári quod cólimus, ut discámus et inimícos dilígere.|祈望天主俾吾攸敬即師法也，克愛吾仇。|
+R|Amen.|亞孟。|
+rule|||
+V|Dóminus vobíscum.|主與爾偕焉。|
+R|Et cum spíritu tuo.|並於爾神。|
+V|Benedicámus Dómino.|讚美主。|
+R|Deo grátias.|謝天主。|
+V|Fidélium ánimæ per misericórdiam Dei requiéscant in pace.|凡諸信者靈魂，賴天主仁慈息止安所。|
+R|Amen.|亞孟。|
+rubric|(Pater noster, secreto.)|(後默念天主經)|
+pagebreak|||
+h1cap|Cantus Gregorianus|額我略聖歌|
+h1lowercase|Antiphona Mariana|聖母對經|
+rubric|Alma Redemptoris Mater|贖世者母|
+score|gabc/alma_redemptoris_mater.gabc||
+rule|||
+h1cap|Imago Sacra|聖像|
+singlecol|||
+image|images/wallpaper.jpg||
+singlecol|||
+thickrule|||
+pagebreak|||
+h1cap|Appendix|附錄|
+singlecol|||
+h2||附注|
+text||1.本文件為Psalter LaTeX Generator系統測試文件，包含所有格式類型的測試。2.格式類型包括：h1cap、h1lowercase、h1、h2、h3。3.經文格式包括：verse、antiphon、gloria、rubric、V、R。4.其他格式包括：text、hymn、hymnheader、collect、psalmtitle。5.特殊功能包括：tocstart、singlecol、pagebreak、thickrule、rule。6.多媒體支持：image、gabc。7.准印功能：imprimatur。|
+h2|Scripsit Clemens B. die IX Ianuarii MMXXVI.|作者：克肋孟 於1145年1月4日|
+singlecol|||

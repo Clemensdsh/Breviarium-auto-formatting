@@ -1,4 +1,22 @@
-\ProvidesPackage{psalter}[2025/12/22 Psalter Style for Roman Breviary - Fixed v2]
+\ProvidesPackage{psalter}[2025/01/08 Psalter Style for Roman Breviary - v3.0 LuaLaTeX]
+
+% ==================================================
+% 0. 引擎检测 - 必须使用 LuaLaTeX
+% ==================================================
+\RequirePackage{iftex}
+\ifluatex
+    % OK - 正在使用 LuaLaTeX
+\else
+    \PackageError{psalter}{%
+        此包必须使用 LuaLaTeX 编译！\MessageBreak
+        请使用命令: lualatex main.tex\MessageBreak
+        或在编辑器中设置编译器为 LuaLaTeX%
+    }{%
+        您当前使用的编译器不是 LuaLaTeX。\MessageBreak
+        ltjsarticle 文档类和 luatexja 包需要 LuaLaTeX。\MessageBreak
+        请检查您的编辑器设置或使用命令行: lualatex main.tex%
+    }
+\fi
 
 % ==================================================
 % 1. 页面布局
@@ -16,14 +34,32 @@
 }
 
 % ==================================================
-% 2. 字体配置
+% 2. 字体配置 (LuaLaTeX / luatexja)
 % ==================================================
 \RequirePackage{fontspec}
+\RequirePackage{luatexja-fontspec}
 
+% 西文字体
 \setmainfont{Times New Roman}[Ligatures=TeX, Scale=1.0]
-\setCJKmainfont{SimSun}[AutoFakeBold=true, AutoFakeSlant=true]
-\setCJKfamilyfont{song}{SimSun}[AutoFakeBold=true, AutoFakeSlant=true]
-\providecommand{\songti}{\CJKfamily{song}}
+
+% 中文字体 - 使用 luatexja-fontspec 的命令
+\setmainjfont{SimSun}[
+    BoldFont = SimHei,           % 粗体 -> 黑体
+    ItalicFont = KaiTi,          % 斜体 -> 楷体
+    BoldItalicFont = KaiTi,      % 粗斜体 -> 楷体
+    BoldItalicFeatures = {FakeBold=3} % 并把这个楷体人工加粗 (数值越大越粗)
+]
+\newjfontfamily\songti{SimSun}[BoldFont=SimHei, ItalicFont=KaiTi]
+\newjfontfamily\heiti{SimHei}[
+    BoldFont=*,
+    AutoFakeBold=2.5,
+    AutoFakeSlant=0.2
+]
+\newjfontfamily\kaiti{KaiTi}[
+    BoldFont=*,            % 粗体时仍使用楷体文件
+    AutoFakeBold=2.5,      % 开启伪粗体（数字越大越粗）
+    AutoFakeSlant=0.2      % 开启伪斜体（如果需要）
+]
 
 % ==================================================
 % 3. 宏包加载
@@ -38,6 +74,38 @@
 \RequirePackage{ifthen}
 \RequirePackage{calc}
 \RequirePackage{graphicx}
+
+% ==================================================
+% 3.1 Gregorio 乐谱支持
+% ==================================================
+\IfFileExists{gregoriotex.sty}{%
+    \RequirePackage[autocompile]{gregoriotex} %
+    \newif\ifgregorioavailable
+    \gregorioavailabletrue
+    % Gregorio 默认设置
+    \gresetlyriccentering{syllable}
+    \gresetannotationvalign{bottom}
+}{%
+    \newif\ifgregorioavailable
+    \gregorioavailablefalse
+    % 定义占位命令，防止未安装Gregorio时报错
+    \newcommand{\gregorioscore}[1]{%
+        \begin{center}%
+        \fbox{\parbox{0.8\textwidth}{\centering\textcolor{rubricred}{%
+            [乐谱: #1]\\[0.5em]%
+            \small 需要安装 GregorioTeX 才能显示乐谱%
+        }}}%
+        \end{center}%
+    }
+    \newcommand{\gabcsnippet}[1]{%
+        \begin{center}%
+        \fbox{\parbox{0.8\textwidth}{\centering\textcolor{rubricred}{%
+            [内联乐谱]\\[0.5em]%
+            \small 需要安装 GregorioTeX 才能显示乐谱%
+        }}}%
+        \end{center}%
+    }
+}
 
 % ==================================================
 % 4. 颜色定义
@@ -157,17 +225,32 @@
 \newcounter{psTocLabelCounter}
 \setcounter{psTocLabelCounter}{0}
 
+% 标记是否已初始化写入文件
+\newif\ifpsTocFilesOpened
+\psTocFilesOpenedfalse
+
 \newcommand{\psInitTocFiles}{%
-    \immediate\openout\tocLatinFile=\jobname-toc-latin.tmp%
-    \immediate\openout\tocChineseFile=\jobname-toc-chinese.tmp%
+    % 此命令现在只是占位符，实际打开在 psPrintToc 后进行
+}
+
+\newcommand{\psOpenTocFilesForWrite}{%
+    \ifpsTocFilesOpened\else
+        \immediate\openout\tocLatinFile=\jobname-toc-latin.tmp%
+        \immediate\openout\tocChineseFile=\jobname-toc-chinese.tmp%
+        \global\psTocFilesOpenedtrue
+    \fi
 }
 
 \newcommand{\psCloseTocFiles}{%
-    \immediate\closeout\tocLatinFile%
-    \immediate\closeout\tocChineseFile%
+    \ifpsTocFilesOpened
+        \immediate\closeout\tocLatinFile%
+        \immediate\closeout\tocChineseFile%
+    \fi
 }
 
 \newcommand{\psWriteTocEntry}[4]{%
+    % 确保文件已打开
+    \psOpenTocFilesForWrite
     \ifnum#1=1%
         \immediate\write\tocLatinFile{\noexpand\psTocSectionEntry{#2}{#4}}%
         \immediate\write\tocChineseFile{\noexpand\psTocSectionEntry{#3}{#4}}%
@@ -186,7 +269,8 @@
 }
 
 \newcommand{\psPrintToc}{%
-    \psCloseTocFiles%
+    % 注意：此时读取的是上一次编译生成的 .tmp 文件
+    % 本次编译的写入会在之后通过 psWriteTocEntry 进行
     \clearpage%
     % 1. 进入目录：切换到专用样式
     \pagestyle{tocstyle}% 
@@ -487,6 +571,10 @@
 \newlength{\psImageNaturalWidth}
 \newlength{\psImageNaturalHeight}
 
+% 图片边缘留空 - 左右各2.5mm
+\newlength{\psImageMargin}
+\setlength{\psImageMargin}{5mm}  % 左右共5mm (各2.5mm)
+
 % 单栏图片
 \newcommand{\psImage}[2][]{%
     \switchcolumn*%
@@ -500,25 +588,25 @@
     \vspace{0.3em}%
 }
 
-% 全宽图片 - 智能缩放
+% 全宽图片 - 智能缩放（带边缘留空）
 \newcommand{\psImageFullWidth}[2][]{%
     \end{paracol}%
     \begin{center}%
         \ifthenelse{\equal{#1}{}}%
         {%
-            % 无高度参数：检查宽度，必要时缩放
+            % 无高度参数：检查宽度，必要时缩放（留出边缘）
             \settowidth{\psImageNaturalWidth}{\includegraphics{#2}}%
-            \ifdim\psImageNaturalWidth>\psTotalTextWidth%
-                \includegraphics[width=\psTotalTextWidth]{#2}%
+            \ifdim\psImageNaturalWidth>\dimexpr\psTotalTextWidth-\psImageMargin\relax%
+                \includegraphics[width=\dimexpr\psTotalTextWidth-\psImageMargin\relax]{#2}%
             \else%
                 \includegraphics[height=\psDefaultImageHeight]{#2}%
             \fi%
         }%
         {%
-            % 有高度参数：先按高度加载，再检查宽度
+            % 有高度参数：先按高度加载，再检查宽度（留出边缘）
             \settowidth{\psImageNaturalWidth}{\includegraphics[height=#1]{#2}}%
-            \ifdim\psImageNaturalWidth>\psTotalTextWidth%
-                \includegraphics[width=\psTotalTextWidth]{#2}%
+            \ifdim\psImageNaturalWidth>\dimexpr\psTotalTextWidth-\psImageMargin\relax%
+                \includegraphics[width=\dimexpr\psTotalTextWidth-\psImageMargin\relax]{#2}%
             \else%
                 \includegraphics[height=#1]{#2}%
             \fi%
@@ -791,13 +879,121 @@
 \newcommand{\psSingleImage}[1]{%
     \begin{center}%
         \settowidth{\psImageNaturalWidth}{\includegraphics{#1}}%
-        \ifdim\psImageNaturalWidth>\textwidth%
-            \includegraphics[width=\textwidth]{#1}%
+        \ifdim\psImageNaturalWidth>\dimexpr\textwidth-\psImageMargin\relax%
+            \includegraphics[width=\dimexpr\textwidth-\psImageMargin\relax]{#1}%
         \else%
             \includegraphics[height=\psDefaultImageHeight]{#1}%
         \fi%
     \end{center}%
     \vspace{0.3em}%
+}
+
+% ==================================================
+% 30. 红黑双色细化
+% ==================================================
+% 行内红字
+\newcommand{\psRed}[1]{\textcolor{rubricred}{#1}}
+% 行内黑字（在红字环境中使用）
+\newcommand{\psBlack}[1]{\textcolor{psalmblack}{#1}}
+
+% ==================================================
+% 31. 答唱咏重复标记
+% ==================================================
+% 重复符号
+\newcommand{\psRepeatMark}{\textcolor{rubricred}{*}}
+% 自动处理 * 星号重复标记
+\newcommand{\psRespond}[1]{%
+    \def\psRespondText{#1}%
+    \StrSubstitute{\psRespondText}{*}{\psRepeatMark}[\psRespondResult]%
+    \psRespondResult%
+}
+
+% ==================================================
+% 32. 圣经引用格式
+% ==================================================
+% 行内圣经引用（斜体小号）
+\newcommand{\psScriptureInline}[1]{%
+    {\small\textit{\textcolor{rubricred}{#1}}}%
+}
+
+% ==================================================
+% 33. 礼仪脚注
+% ==================================================
+\newcounter{psFootnoteCounter}
+\setcounter{psFootnoteCounter}{0}
+\newcommand{\psLiturgyFootnote}[1]{%
+    \stepcounter{psFootnoteCounter}%
+    \textsuperscript{\textcolor{rubricred}{\thepsFootnoteCounter}}%
+    \marginpar{\tiny\textcolor{rubricred}{\thepsFootnoteCounter.~#1}}%
+}
+
+% ==================================================
+% 34. 签名块 (Imprimatur / Nihil Obstat)
+% ==================================================
+% Imprimatur 签名块
+\newcommand{\psImprimatur}[3]{%
+    \begin{center}%
+    \vspace{1em}%
+    {\large\textsc{Imprimatur}}\\[0.5em]%
+    {\textcolor{rubricred}{\textit{#1}}}\\[0.3em]%  % bishop
+    {\small #3}\\[0.2em]%  % diocese
+    {\small\textit{#2}}%   % date
+    \vspace{1em}%
+    \end{center}%
+}
+
+% Nihil Obstat 块
+\newcommand{\psNihilObstat}[2]{%
+    \begin{center}%
+    \vspace{0.5em}%
+    {\textsc{Nihil Obstat}}\\[0.3em]%
+    {\textit{#1}}\\[0.2em]%  % censor
+    {\small\textit{#2}}%     % date
+    \vspace{0.5em}%
+    \end{center}%
+}
+
+% ==================================================
+% 35. 乐谱渲染宏（配合Python端使用）
+% ==================================================
+% 乐谱包装器 - 自动处理单栏切换
+\newcommand{\psScore}[2][]{%
+    % #1 = 可选标题/注释
+    % #2 = gabc文件路径（不带扩展名）或内联代码
+    \ifx&#1&%
+        % 无标题
+    \else%
+        \psSingleRubric{#1}%
+    \fi%
+    \ifgregorioavailable%
+        \gresetlyriccentering{firstletter}%
+        \gregorioscore{#2}%
+    \else%
+        \begin{center}%
+        \fbox{\parbox{0.8\textwidth}{\centering\textcolor{rubricred}{%
+            [乐谱: #2]\\[0.5em]%
+            \small 需要安装 GregorioTeX%
+        }}}%
+        \end{center}%
+    \fi%
+    \vspace{0.5em}%
+}
+
+% 内联GABC代码
+\newcommand{\psScoreInline}[2][]{%
+    \ifx&#1&\else\psSingleRubric{#1}\fi%
+    \ifgregorioavailable%
+        \gresetlyriccentering{firstletter}%
+        \gabcsnippet{#2}%
+    \else%
+        \begin{center}%
+        \fbox{\parbox{0.8\textwidth}{\centering\textcolor{rubricred}{%
+            [内联乐谱]\\[0.5em]%
+            \small 需要安装 GregorioTeX%
+        }}}%
+        \end{center}%
+    \fi%
+    \vspace{0.5em}%
 }
 
 \endinput
