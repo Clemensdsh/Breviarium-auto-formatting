@@ -8,7 +8,10 @@ A LaTeX-based tool for typesetting the Roman Breviary with parallel Latin-Chines
 
 基于 LaTeX 的罗马日课排版工具，支持拉丁文-中文双栏对照。
 
-本项目LaTeX逻辑的早期成果见 https://clemensdsh.github.io/2025/12/23/pdftest/ （羅馬大日課-耶穌聖誕瞻禮（中拉對照））。首页如上图
+本项目LaTeX逻辑的早期成果见 
+https://clemensdsh.github.io/2025/12/23/pdftest/ 
+（羅馬大日課-耶穌聖誕瞻禮（中拉對照））
+
 ---
 
 ## ✝️ Features / 功能特点
