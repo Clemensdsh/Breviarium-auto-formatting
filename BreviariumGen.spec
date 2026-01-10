@@ -12,6 +12,7 @@ a = Analysis(
         ('psalter.sty', '.'),
         ('main.tex', '.'),
         ('cross_of_saint_stephen.png', '.'),
+        ('.latexmkrc', '.'),
     ],
     hiddenimports=[],
     hookspath=[],
