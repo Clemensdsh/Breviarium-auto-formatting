@@ -8,10 +8,17 @@ main.py - 程序入口点
 import argparse
 import tkinter as tk
 import sys
+import sys
+import os
 
 from psalter_generator import PsalterApp, init_logging, AppConfig
 
-
+def resource_path(relative_path):
+    """ 获取资源的绝对路径，适配开发环境和 PyInstaller 打包后的环境 """
+    # 尝试获取 _MEIPASS，如果获取不到（开发环境），就使用当前目录
+    base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
+    
+    return os.path.join(base_path, relative_path)
 def parse_args() -> argparse.Namespace:
     """解析命令行参数"""
     parser = argparse.ArgumentParser(
