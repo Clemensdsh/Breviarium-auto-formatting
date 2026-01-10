@@ -16,10 +16,12 @@ _icon_path: Optional[str] = None
 
 
 def _get_base_dir() -> str:
-    """获取项目根目录"""
-    if getattr(sys, 'frozen', False):
-        return os.path.dirname(sys.executable)
+    """获取资源文件基础路径（兼容PyInstaller打包）"""
+    if hasattr(sys, '_MEIPASS'):
+        # PyInstaller 打包后，资源在临时目录 _MEIPASS 中
+        return sys._MEIPASS
     else:
+        # 开发环境
         return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 

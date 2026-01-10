@@ -38,9 +38,19 @@ from .modules import HourType, HourModule, ModuleConfig, create_hour_module
 logger = logging.getLogger(__name__)
 
 
-def get_application_path() -> str:
-    """获取应用程序运行目录"""
-    if getattr(sys, 'frozen', False):
+def get_resource_path() -> str:
+    """获取资源文件目录（兼容PyInstaller打包）"""
+    if hasattr(sys, '_MEIPASS'):
+        # PyInstaller 打包后，资源在临时目录 _MEIPASS 中
+        return sys._MEIPASS
+    else:
+        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def get_working_path() -> str:
+    """获取工作目录（exe所在目录，用于输出文件）"""
+    if hasattr(sys, '_MEIPASS'):
+        # PyInstaller 打包后，工作目录为 exe 所在目录
         return os.path.dirname(sys.executable)
     else:
         return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -61,15 +71,21 @@ class PsalterApp:
         self.button_factory = ButtonFactory(theme)
         
         # 路径
-        self.base_dir = get_application_path()
-        self.content_dir = os.path.join(self.base_dir, "content")
-        self.images_dir = os.path.join(self.base_dir, "images")
-        self.gabc_dir = os.path.join(self.base_dir, "gabc")
+        self.resource_dir = get_resource_path()  # 资源文件（打包的content/images/gabc等）
+        self.working_dir = get_working_path()    # 工作目录（exe旁边，用于build输出）
+        
+        self.content_dir = os.path.join(self.resource_dir, "content")
+        self.images_dir = os.path.join(self.working_dir, "images")  # 用户图片放exe旁边
+        self.gabc_dir = os.path.join(self.working_dir, "gabc")      # 用户gabc放exe旁边
         
         # 业务组件
         self.content_manager = ContentManager(self.content_dir)
         self.body_generator = BodyTexGenerator()
-        self.compiler_service = CompilerService(self.base_dir, self.config)
+        self.compiler_service = CompilerService(
+            resource_dir=self.resource_dir,
+            working_dir=self.working_dir,
+            config=self.config
+        )
         
         # 数据
         self.title_data = TitlePageData()

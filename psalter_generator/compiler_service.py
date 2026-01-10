@@ -60,9 +60,10 @@ class CompileOutput:
 class BuildDirectoryManager:
     """构建目录管理器"""
     
-    def __init__(self, base_dir: str, build_dir_name: str = "build"):
-        self.base_dir = Path(base_dir)
-        self.build_dir = self.base_dir / build_dir_name
+    def __init__(self, resource_dir: str, working_dir: str, build_dir_name: str = "build"):
+        self.resource_dir = Path(resource_dir)  # 资源文件所在目录（打包的文件）
+        self.working_dir = Path(working_dir)    # 工作目录（exe旁边）
+        self.build_dir = self.working_dir / build_dir_name  # build在exe旁边
     
     def prepare(self) -> bool:
         """准备构建目录（清空或创建）"""
@@ -91,19 +92,19 @@ class BuildDirectoryManager:
     def copy_resources(self, files: List[str], directories: Optional[List[str]] = None) -> bool:
         """复制资源文件到构建目录"""
         try:
-            # 复制文件
+            # 复制文件（从资源目录）
             for filename in files:
-                src = self.base_dir / filename
+                src = self.resource_dir / filename
                 if src.exists():
                     shutil.copy2(src, self.build_dir)
                     logger.debug(f"已复制: {filename}")
                 else:
                     logger.warning(f"资源文件不存在: {src}")
             
-            # 复制目录
+            # 复制目录（从资源目录）
             if directories:
                 for dirname in directories:
-                    src = self.base_dir / dirname
+                    src = self.resource_dir / dirname
                     dst = self.build_dir / dirname
                     if src.exists():
                         shutil.copytree(src, dst, dirs_exist_ok=True)
@@ -243,23 +244,25 @@ class PDFViewer:
 class CompilerService:
     """编译服务 - 整合所有编译相关功能"""
     
-    def __init__(self, base_dir: str, config: Optional[AppConfig] = None, engine: str = "lualatex"):
-        self.base_dir = Path(base_dir)
+    def __init__(self, resource_dir: str, working_dir: str = None, config: Optional[AppConfig] = None, engine: str = "lualatex"):
+        self.resource_dir = Path(resource_dir)  # 资源文件目录
+        self.working_dir = Path(working_dir) if working_dir else self.resource_dir  # 工作目录
         self.config = config or AppConfig()
         self.engine = engine
         
         self.build_manager = BuildDirectoryManager(
-            str(base_dir), 
+            str(resource_dir),
+            str(self.working_dir),
             self.config.build_dir_name
         )
         self.compiler = LaTeXCompiler(self.config.compiler_timeout, engine=engine)
-        self.main_generator = MainTexGenerator(str(self.base_dir / "main.tex"))
+        self.main_generator = MainTexGenerator(str(self.resource_dir / "main.tex"))
         self.body_generator = BodyTexGenerator()
         
         # 添加gabc到资源目录列表
         self._resource_directories = list(self.config.resource_directories) + ["gabc"]
         
-        logger.info(f"CompilerService 初始化: {base_dir} (引擎: {engine})")
+        logger.info(f"CompilerService 初始化: 资源={resource_dir}, 工作={self.working_dir} (引擎: {engine})")
     
     def set_engine(self, engine: str) -> None:
         """设置编译引擎"""
@@ -272,7 +275,7 @@ class CompilerService:
         missing = []
         
         for filename in self.config.required_files:
-            if not (self.base_dir / filename).exists():
+            if not (self.resource_dir / filename).exists():
                 missing.append(filename)
         
         return len(missing) == 0, missing

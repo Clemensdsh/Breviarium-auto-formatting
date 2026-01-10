@@ -48,8 +48,9 @@ class ModuleSelectionDialog:
         """设置窗口图标"""
         try:
             import os, sys
-            if getattr(sys, 'frozen', False):
-                base_dir = os.path.dirname(sys.executable)
+            if hasattr(sys, '_MEIPASS'):
+                # PyInstaller 打包后，资源在临时目录 _MEIPASS 中
+                base_dir = sys._MEIPASS
             else:
                 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             
