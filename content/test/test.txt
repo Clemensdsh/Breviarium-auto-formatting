@@ -71,7 +71,7 @@ h1lowercase|Antiphona Mariana|聖母對經|
 rubric|Alma Redemptoris Mater|贖世者母|
 score|gabc/alma_redemptoris_mater.gabc||
 rule|||
-h1cap|Imago Sacra|聖像|
+h1cap|Imago |圖像測試|
 singlecol|||
 image|images/wallpaper.jpg||
 singlecol|||
