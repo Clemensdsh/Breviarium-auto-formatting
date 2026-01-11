@@ -12,7 +12,8 @@ import shutil
 import logging
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog
-from typing import Optional
+from typing import Optional, List
+import copy
 
 from .theme import Theme, DEFAULT_THEME
 from .models import ContentItem, TitlePageData, MultiLineContentItem
@@ -26,7 +27,7 @@ from .ui_components import (
 )
 from .dialogs import (
     CustomContentDialog, TitlePageDialog, 
-    CompileErrorDialog, LoadingDialog, ScoreDialog,
+    CompileErrorDialog, CompileProgressDialog, ScoreDialog,
     RuleTypeDialog, ImageDialog
 )
 from .module_dialogs import (
@@ -41,7 +42,6 @@ logger = logging.getLogger(__name__)
 def get_resource_path() -> str:
     """获取资源文件目录（兼容PyInstaller打包）"""
     if hasattr(sys, '_MEIPASS'):
-        # PyInstaller 打包后，资源在临时目录 _MEIPASS 中
         return sys._MEIPASS
     else:
         return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -50,10 +50,26 @@ def get_resource_path() -> str:
 def get_working_path() -> str:
     """获取工作目录（exe所在目录，用于输出文件）"""
     if hasattr(sys, '_MEIPASS'):
-        # PyInstaller 打包后，工作目录为 exe 所在目录
         return os.path.dirname(sys.executable)
     else:
         return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def ensure_external_content(resource_dir: str, working_dir: str) -> str:
+    """确保外部content文件夹存在"""
+    internal_content = os.path.join(resource_dir, "content")
+    external_content = os.path.join(working_dir, "content")
+    
+    if not os.path.exists(external_content):
+        if os.path.exists(internal_content):
+            try:
+                shutil.copytree(internal_content, external_content)
+                logger.info(f"已将内置content复制到: {external_content}")
+            except Exception as e:
+                logger.error(f"复制content失败: {e}")
+                return internal_content
+    
+    return external_content
 
 
 class PsalterApp:
@@ -71,12 +87,13 @@ class PsalterApp:
         self.button_factory = ButtonFactory(theme)
         
         # 路径
-        self.resource_dir = get_resource_path()  # 资源文件（打包的content/images/gabc等）
-        self.working_dir = get_working_path()    # 工作目录（exe旁边，用于build输出）
+        self.resource_dir = get_resource_path()
+        self.working_dir = get_working_path()
         
-        self.content_dir = os.path.join(self.resource_dir, "content")
-        self.images_dir = os.path.join(self.working_dir, "images")  # 用户图片放exe旁边
-        self.gabc_dir = os.path.join(self.working_dir, "gabc")      # 用户gabc放exe旁边
+        # 使用外部content文件夹
+        self.content_dir = ensure_external_content(self.resource_dir, self.working_dir)
+        self.images_dir = os.path.join(self.working_dir, "images")
+        self.gabc_dir = os.path.join(self.working_dir, "gabc")
         
         # 业务组件
         self.content_manager = ContentManager(self.content_dir)
@@ -90,6 +107,11 @@ class PsalterApp:
         # 数据
         self.title_data = TitlePageData()
         
+        # 撤销/重做栈
+        self._undo_stack: List = []
+        self._redo_stack: List = []
+        self._clipboard: List = []
+        
         # 初始化
         os.makedirs(self.images_dir, exist_ok=True)
         os.makedirs(self.gabc_dir, exist_ok=True)
@@ -99,30 +121,25 @@ class PsalterApp:
         logger.info("PsalterApp 初始化完成")
     
     def _configure_window(self) -> None:
-        """配置窗口 - 确保完整显示"""
+        """配置窗口"""
         self.root.title("Psalter LaTeX Generator")
         
-        # 获取屏幕尺寸
         screen_width = self.root.winfo_screenwidth()
         screen_height = self.root.winfo_screenheight()
         
-        # 窗口尺寸（略小于屏幕，留出任务栏空间）
         window_width = min(1280, screen_width - 100)
-        window_height = min(850, screen_height - 100)  # 留出任务栏空间
+        window_height = min(950, screen_height - 80)
         
-        # 居中位置
         x = (screen_width - window_width) // 2
-        y = max(20, (screen_height - window_height) // 2 - 40)  # 略微靠上，确保底部可见
+        y = max(10, (screen_height - window_height) // 2 - 30)
         
         self.root.geometry(f"{window_width}x{window_height}+{x}+{y}")
-        self.root.minsize(900, 600)
+        self.root.minsize(900, 700)
         self.root.configure(bg=self.theme.BG_DARK)
         
-        # 延迟设置窗口图标，确保窗口完全初始化
         self.root.after(100, self._set_window_icon)
     
     def _set_window_icon(self) -> None:
-        """设置主窗口图标"""
         try:
             from .icon import set_window_icon
             set_window_icon(self.root)
@@ -130,7 +147,6 @@ class PsalterApp:
             logger.warning(f"设置窗口图标失败: {e}")
     
     def _setup_ui(self) -> None:
-        """设置UI"""
         main = tk.Frame(self.root, bg=self.theme.BG_DARK)
         main.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         main.columnconfigure(0, weight=0, minsize=220)
@@ -141,18 +157,15 @@ class PsalterApp:
         self._setup_center_right_panel(main)
     
     def _setup_left_panel(self, parent: tk.Frame) -> None:
-        """左侧面板 - 文件浏览"""
         left = tk.Frame(parent, bg=self.theme.BG_DARK, width=230)
         left.grid(row=0, column=0, sticky='nsew', padx=(0, 8))
         left.grid_propagate(False)
         
-        # 标题
         tk.Label(
             left, text="内容来源", bg=self.theme.BG_DARK, fg=self.theme.RUBRIC_RED,
             font=self.theme.get_font("title", bold=True)
         ).pack(anchor='w', pady=(0, 8))
         
-        # 文件树
         tree_frame = tk.Frame(left, bg=self.theme.BG_LIGHT, highlightthickness=1, 
                              highlightbackground=self.theme.BORDER)
         tree_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 8))
@@ -161,11 +174,9 @@ class PsalterApp:
         self.file_tree.pack(fill=tk.BOTH, expand=True)
         self._load_file_tree()
         
-        # 按钮区域
-        btn_frame = tk.Frame(left, bg=self.theme.BG_DARK)
-        btn_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=5)
+        btn_container = tk.Frame(left, bg=self.theme.BG_DARK)
+        btn_container.pack(side=tk.BOTTOM, fill=tk.X, pady=5)
         
-        # 主要操作按钮
         buttons = [
             ("添加选中文件", self._add_selected_file, "accent"),
             ("添加自定义内容", self._add_custom_content, "default"),
@@ -175,31 +186,31 @@ class PsalterApp:
             ("添加分隔线", self._add_rule, "default"),
             ("添加分页", self._add_pagebreak, "default"),
             ("添加目录起始", self._add_tocstart, "default"),
-            ("切换单栏/双栏", self._add_singlecol, "default"),  # 与分页按钮相同颜色
+            ("切换单栏/双栏", self._add_singlecol, "default"),
             ("添加签名块", self._add_imprimatur, "default"),
         ]
         
         for text, cmd, style in buttons:
-            btn = self.button_factory.create(btn_frame, text, cmd, style)
+            btn = self.button_factory.create(btn_container, text, cmd, style)
             btn.pack(fill=tk.X, pady=2)
         
-        # 图片说明
         tk.Label(
-            btn_frame, text="* 图片须放在 images 文件夹", 
+            btn_container, text="* 图片须放在 images 文件夹", 
             bg=self.theme.BG_DARK, fg=self.theme.TEXT_SEC,
             font=self.theme.get_font("small")
         ).pack(anchor='w', pady=(2, 5))
         
-        # 分隔线
-        tk.Frame(btn_frame, bg=self.theme.BORDER, height=1).pack(fill=tk.X, pady=5)
+        tk.Frame(btn_container, bg=self.theme.BORDER, height=1).pack(fill=tk.X, pady=5)
         
-        # 封面设置
         self.button_factory.create(
-            btn_frame, "设置封面标题", self._edit_title_page, "accent"
+            btn_container, "设置封面标题", self._edit_title_page, "accent"
+        ).pack(fill=tk.X, pady=2)
+        
+        self.button_factory.create(
+            btn_container, "刷新文件列表", self._reload_file_tree, "default"
         ).pack(fill=tk.X, pady=2)
     
     def _setup_center_right_panel(self, parent: tk.Frame) -> None:
-        """中右侧面板"""
         paned = PanedWindow(parent, self.theme, initial_ratio=0.35)
         paned.grid(row=0, column=1, sticky='nsew')
         
@@ -208,19 +219,32 @@ class PsalterApp:
     
     def _setup_center_panel(self, parent: tk.Frame) -> None:
         """中间面板 - 内容列表"""
-        # 标题
         tk.Label(
             parent, text="当前内容", bg=self.theme.BG_LIGHT, fg=self.theme.RUBRIC_RED,
             font=self.theme.get_font("title", bold=True)
         ).pack(anchor='w', pady=(8, 8), padx=8)
         
-        # 列表框
         list_frame = tk.Frame(parent, bg=self.theme.BG_LIGHT)
         list_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 8), padx=8)
         
-        self.content_listbox = ScrollableListbox(list_frame, self.theme)
+        self.content_listbox = ScrollableListbox(list_frame, self.theme, selectmode=tk.EXTENDED)
         self.content_listbox.pack(fill=tk.BOTH, expand=True)
         self.content_listbox.bind('<Double-1>', lambda e: self._edit_item())
+        
+        # 绑定快捷键到listbox
+        self.content_listbox.listbox.bind('<Delete>', lambda e: self._delete_item())
+        self.content_listbox.listbox.bind('<Control-a>', lambda e: self._select_all())
+        self.content_listbox.listbox.bind('<Control-A>', lambda e: self._select_all())
+        self.content_listbox.listbox.bind('<Control-c>', lambda e: self._copy_selected())
+        self.content_listbox.listbox.bind('<Control-C>', lambda e: self._copy_selected())
+        self.content_listbox.listbox.bind('<Control-x>', lambda e: self._cut_selected())
+        self.content_listbox.listbox.bind('<Control-X>', lambda e: self._cut_selected())
+        self.content_listbox.listbox.bind('<Control-v>', lambda e: self._paste())
+        self.content_listbox.listbox.bind('<Control-V>', lambda e: self._paste())
+        self.content_listbox.listbox.bind('<Control-z>', lambda e: self._undo())
+        self.content_listbox.listbox.bind('<Control-Z>', lambda e: self._undo())
+        self.content_listbox.listbox.bind('<Control-y>', lambda e: self._redo())
+        self.content_listbox.listbox.bind('<Control-Y>', lambda e: self._redo())
         
         # 操作按钮
         ops = tk.Frame(parent, bg=self.theme.BG_LIGHT)
@@ -243,11 +267,20 @@ class PsalterApp:
     
     def _setup_right_panel(self, parent: tk.Frame) -> None:
         """右侧面板 - 预览和导出"""
-        # 标题
+        # 标题行
+        title_frame = tk.Frame(parent, bg=self.theme.BG_LIGHT)
+        title_frame.pack(anchor='w', pady=(8, 8), padx=8, fill=tk.X)
+        
         tk.Label(
-            parent, text="预览和导出", bg=self.theme.BG_LIGHT, fg=self.theme.RUBRIC_RED,
+            title_frame, text="预览和导出", bg=self.theme.BG_LIGHT, fg=self.theme.RUBRIC_RED,
             font=self.theme.get_font("title", bold=True)
-        ).pack(anchor='w', pady=(8, 8), padx=8)
+        ).pack(side=tk.LEFT)
+        
+        tk.Label(
+            title_frame, text="（只读，编辑请双击左侧列表项）", 
+            bg=self.theme.BG_LIGHT, fg=self.theme.TEXT_SEC,
+            font=self.theme.get_font("small")
+        ).pack(side=tk.LEFT, padx=(10, 0))
         
         # 预览区
         preview_frame = tk.Frame(parent, bg=self.theme.BG_LIGHT, highlightthickness=1,
@@ -257,7 +290,8 @@ class PsalterApp:
         self.preview_text = tk.Text(
             preview_frame, bg="#FFFFFF", fg=self.theme.TEXT,
             insertbackground=self.theme.TEXT, font=self.theme.get_mono_font(),
-            borderwidth=0, highlightthickness=0, wrap=tk.NONE, padx=8, pady=8
+            borderwidth=0, highlightthickness=0, wrap=tk.NONE, padx=8, pady=8,
+            state=tk.DISABLED
         )
         self.preview_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
@@ -272,11 +306,11 @@ class PsalterApp:
         for text, cmd, style, w in [
             ("刷新预览", self._refresh_preview, "default", 8),
             ("保存CSV", self._export_csv, "default", 8),
-            ("导出 Body.tex", self._export_tex, "danger", 12),  # 改为红色
+            ("导出 Body.tex", self._export_tex, "danger", 12),
         ]:
             self.button_factory.create(export_frame, text, cmd, style, width=w).pack(side=tk.LEFT, padx=2)
         
-        # 编译按钮 - 礼仪红醒目
+        # 编译按钮
         compile_btn = tk.Label(
             export_frame, text="编译并预览 PDF",
             bg=self.theme.RUBRIC_RED, fg="#FFFFFF",
@@ -287,6 +321,85 @@ class PsalterApp:
         compile_btn.bind('<Enter>', lambda e: compile_btn.config(bg=self.theme.RUBRIC_DARK))
         compile_btn.bind('<Leave>', lambda e: compile_btn.config(bg=self.theme.RUBRIC_RED))
         compile_btn.bind('<Button-1>', lambda e: self._compile_preview())
+    
+    # ========== 撤销/重做/剪贴板 ==========
+    
+    def _save_state(self) -> None:
+        """保存当前状态用于撤销"""
+        # 获取items的真实副本
+        state = [copy.deepcopy(item) for item in self.content_manager]
+        self._undo_stack.append(state)
+        self._redo_stack.clear()
+        if len(self._undo_stack) > 50:
+            self._undo_stack.pop(0)
+    
+    def _restore_state(self, state: List) -> None:
+        """恢复状态"""
+        self.content_manager.clear()
+        for item in state:
+            self.content_manager.add(copy.deepcopy(item))
+    
+    def _undo(self) -> None:
+        """撤销"""
+        if not self._undo_stack:
+            return
+        # 保存当前状态到redo栈
+        current = [copy.deepcopy(item) for item in self.content_manager]
+        self._redo_stack.append(current)
+        # 恢复上一个状态
+        self._restore_state(self._undo_stack.pop())
+        self._refresh_listbox()
+        self._refresh_preview()
+    
+    def _redo(self) -> None:
+        """重做"""
+        if not self._redo_stack:
+            return
+        # 保存当前状态到undo栈
+        current = [copy.deepcopy(item) for item in self.content_manager]
+        self._undo_stack.append(current)
+        # 恢复redo状态
+        self._restore_state(self._redo_stack.pop())
+        self._refresh_listbox()
+        self._refresh_preview()
+    
+    def _select_all(self) -> None:
+        """全选"""
+        self.content_listbox.listbox.selection_set(0, tk.END)
+        return "break"
+    
+    def _copy_selected(self) -> None:
+        """复制选中项"""
+        sel = list(self.content_listbox.curselection())
+        if sel:
+            self._clipboard = [copy.deepcopy(self.content_manager.get(i)) for i in sel]
+        return "break"
+    
+    def _cut_selected(self) -> None:
+        """剪切选中项"""
+        self._copy_selected()
+        if self._clipboard:
+            self._delete_item()
+        return "break"
+    
+    def _paste(self) -> None:
+        """粘贴"""
+        if not self._clipboard:
+            return "break"
+        self._save_state()
+        sel = list(self.content_listbox.curselection())
+        insert_pos = sel[-1] + 1 if sel else self.content_manager.count
+        for i, item in enumerate(self._clipboard):
+            self.content_manager.add(copy.deepcopy(item))
+            # 移动到正确位置
+            current_pos = self.content_manager.count - 1
+            target_pos = insert_pos + i
+            while current_pos > target_pos:
+                self.content_manager.move_up(current_pos)
+                current_pos -= 1
+        self._refresh_listbox()
+        self._refresh_preview()
+        return "break"
     
     # ========== 文件树 ==========
     
@@ -300,6 +413,11 @@ class PsalterApp:
             for _, filename in files.get(category, []):
                 self.file_tree.insert(cat_id, tk.END, text=filename, values=(category, filename))
     
+    def _reload_file_tree(self) -> None:
+        """刷新文件列表（重新加载content目录）"""
+        self.content_manager = ContentManager(self.content_dir)
+        self._load_file_tree()
+    
     # ========== 内容操作 ==========
     
     def _add_selected_file(self) -> None:
@@ -308,6 +426,7 @@ class PsalterApp:
             messagebox.showwarning("提示", "请先选择要添加的文件")
             return
         
+        self._save_state()
         for sid in selection:
             item = self.file_tree.item(sid)
             vals = item.get('values', [])
@@ -322,26 +441,27 @@ class PsalterApp:
         self.root.wait_window(dialog.top)
         
         if dialog.result:
+            self._save_state()
             self.content_manager.add(dialog.result)
             self._refresh_listbox()
             self._refresh_preview()
     
     def _add_image(self) -> None:
-        """添加图片 - 自动定位到images目录"""
         dialog = ImageDialog(self.root, self.images_dir, self.theme)
         self.root.wait_window(dialog.top)
         
         if dialog.result:
+            self._save_state()
             self.content_manager.add(dialog.result)
             self._refresh_listbox()
             self._refresh_preview()
     
     def _add_score(self) -> None:
-        """添加乐谱"""
         dialog = ScoreDialog(self.root, gabc_dir=self.gabc_dir, theme=self.theme)
         self.root.wait_window(dialog.top)
         
         if dialog.result:
+            self._save_state()
             if dialog.result.arg != "inline":
                 src_path = dialog.result.latin
                 if os.path.exists(src_path):
@@ -356,62 +476,82 @@ class PsalterApp:
             self._refresh_preview()
     
     def _add_rule(self) -> None:
-        """添加分隔线 - 使用正式选择对话框"""
         dialog = RuleTypeDialog(self.root, self.theme)
-        result = dialog.show()
+        self.root.wait_window(dialog.top)
         
-        if result == "thin":
-            self.content_manager.add(ContentItem("rule", "", "", ""))
-        elif result == "thick":
-            self.content_manager.add(ContentItem("thickrule", "", "", ""))
-        
-        if result:
+        if dialog.result:
+            self._save_state()
+            self.content_manager.add(dialog.result)
             self._refresh_listbox()
             self._refresh_preview()
     
     def _add_pagebreak(self) -> None:
-        self.content_manager.add(ContentItem("pagebreak", "", "", ""))
+        self._save_state()
+        self.content_manager.add(ContentItem("pagebreak", "", ""))
         self._refresh_listbox()
         self._refresh_preview()
     
     def _add_tocstart(self) -> None:
-        self.content_manager.add(ContentItem("tocstart", "", "", ""))
+        self._save_state()
+        self.content_manager.add(ContentItem("tocstart", "", ""))
         self._refresh_listbox()
         self._refresh_preview()
     
     def _add_singlecol(self) -> None:
-        self.content_manager.add(ContentItem("singlecol", "", "", ""))
+        self._save_state()
+        result = messagebox.askquestion("切换栏模式", "选择栏模式：\n\n是 = 进入单栏模式\n否 = 退出单栏模式")
+        if result == 'yes':
+            self.content_manager.add(ContentItem("singlecol_enter", "", ""))
+        else:
+            self.content_manager.add(ContentItem("singlecol_exit", "", ""))
         self._refresh_listbox()
         self._refresh_preview()
     
+    # ========== 列表操作（支持多选）==========
+    
     def _move_up(self) -> None:
-        sel = self.content_listbox.curselection()
+        """上移选中项（支持多选）"""
+        sel = list(self.content_listbox.curselection())
         if not sel or sel[0] == 0:
             return
         
-        idx = sel[0]
-        if self.content_manager.move_up(idx):
-            self._refresh_listbox()
+        self._save_state()
+        # 从上到下依次移动
+        for idx in sel:
+            self.content_manager.move_up(idx)
+        
+        self._refresh_listbox()
+        # 重新选中（位置-1）
+        for idx in sel:
             self.content_listbox.selection_set(idx - 1)
-            self._refresh_preview()
+        self._refresh_preview()
     
     def _move_down(self) -> None:
-        sel = self.content_listbox.curselection()
-        if not sel or sel[0] >= self.content_manager.count - 1:
+        """下移选中项（支持多选）"""
+        sel = list(self.content_listbox.curselection())
+        if not sel or sel[-1] >= self.content_manager.count - 1:
             return
         
-        idx = sel[0]
-        if self.content_manager.move_down(idx):
-            self._refresh_listbox()
+        self._save_state()
+        # 从下到上依次移动
+        for idx in reversed(sel):
+            self.content_manager.move_down(idx)
+        
+        self._refresh_listbox()
+        # 重新选中（位置+1）
+        for idx in sel:
             self.content_listbox.selection_set(idx + 1)
-            self._refresh_preview()
+        self._refresh_preview()
     
     def _edit_item(self) -> None:
+        """编辑选中项（只编辑第一个）"""
         sel = self.content_listbox.curselection()
         if not sel:
             return
         
-        item = self.content_manager.get(sel[0])
+        idx = sel[0]
+        item = self.content_manager.get(idx)
+        
         if isinstance(item, MultiLineContentItem):
             messagebox.showinfo("提示", "多行文件内容无法直接编辑。")
             return
@@ -420,22 +560,31 @@ class PsalterApp:
         self.root.wait_window(dialog.top)
         
         if dialog.result:
-            self.content_manager.update(sel[0], dialog.result)
+            self._save_state()
+            self.content_manager.update(idx, dialog.result)
             self._refresh_listbox()
             self._refresh_preview()
     
     def _delete_item(self) -> None:
-        sel = self.content_listbox.curselection()
+        """删除选中项（支持多选）"""
+        sel = list(self.content_listbox.curselection())
         if not sel:
             return
         
-        if messagebox.askyesno("确认", "确定要删除选中的项目吗？"):
-            self.content_manager.remove(sel[0])
-            self._refresh_listbox()
-            self._refresh_preview()
+        self._save_state()
+        # 从后往前删除，避免索引错位
+        for idx in reversed(sel):
+            self.content_manager.remove(idx)
+        
+        self._refresh_listbox()
+        self._refresh_preview()
     
     def _clear_all(self) -> None:
+        if self.content_manager.is_empty():
+            return
+        
         if messagebox.askyesno("确认", "确定要清空所有内容吗？"):
+            self._save_state()
             self.content_manager.clear()
             self._refresh_listbox()
             self._refresh_preview()
@@ -448,6 +597,7 @@ class PsalterApp:
             self.content_listbox.insert(tk.END, item.get_display_text())
     
     def _refresh_preview(self) -> None:
+        self.preview_text.config(state=tk.NORMAL)
         self.preview_text.delete(1.0, tk.END)
         try:
             text = self.content_manager.to_preview_text()
@@ -455,6 +605,7 @@ class PsalterApp:
         except Exception as e:
             logger.error(f"预览出错: {e}")
             self.preview_text.insert(tk.END, f"预览出错: {str(e)}")
+        self.preview_text.config(state=tk.DISABLED)
     
     # ========== 标题页 ==========
     
@@ -516,45 +667,47 @@ class PsalterApp:
             messagebox.showwarning("提示", "内容为空，无法编译")
             return
         
-        loading = LoadingDialog(self.root, "正在编译...", self.theme)
+        progress_dialog = CompileProgressDialog(self.root, self.theme)
         
         def progress(msg: str) -> None:
-            loading.update_message(msg)
+            progress_dialog.update_message(msg)
         
-        try:
-            output = self.compiler_service.compile_and_preview(
-                self.content_manager.items,
-                self.title_data,
-                progress
-            )
-            
-            loading.close()
-            
-            if output.result == CompileResult.SUCCESS:
-                if output.warnings:
-                    logger.warning(f"编译警告: {len(output.warnings)} 条")
-            elif output.result == CompileResult.MISSING_FILES:
-                messagebox.showerror("错误", f"缺失核心文件:\n{output.message}")
-            elif output.result == CompileResult.COMPILER_NOT_FOUND:
-                messagebox.showerror("错误", output.message)
-            elif output.result == CompileResult.COMPILE_ERROR:
-                CompileErrorDialog(self.root, output.error_log or "", self.theme)
-            elif output.result == CompileResult.COMPILE_TIMEOUT:
-                messagebox.showerror("错误", "编译超时，请检查文档是否过于复杂")
-            elif output.result == CompileResult.PDF_NOT_GENERATED:
-                messagebox.showerror("失败", "编译完成但未生成PDF")
-            else:
-                messagebox.showerror("错误", output.message)
+        def do_compile():
+            try:
+                output = self.compiler_service.compile_and_preview(
+                    self.content_manager.items,
+                    self.title_data,
+                    progress
+                )
                 
-        except Exception as e:
-            loading.close()
-            logger.exception("编译异常")
-            messagebox.showerror("系统错误", str(e))
+                progress_dialog.close()
+                
+                if output.result == CompileResult.SUCCESS:
+                    if output.warnings:
+                        logger.warning(f"编译警告: {len(output.warnings)} 条")
+                elif output.result == CompileResult.MISSING_FILES:
+                    messagebox.showerror("错误", f"缺失核心文件:\n{output.message}")
+                elif output.result == CompileResult.COMPILER_NOT_FOUND:
+                    messagebox.showerror("错误", output.message)
+                elif output.result == CompileResult.COMPILE_ERROR:
+                    CompileErrorDialog(self.root, output.error_log or "", self.theme)
+                elif output.result == CompileResult.COMPILE_TIMEOUT:
+                    messagebox.showerror("错误", "编译超时，请检查文档是否过于复杂")
+                elif output.result == CompileResult.PDF_NOT_GENERATED:
+                    messagebox.showerror("失败", "编译完成但未生成PDF")
+                else:
+                    messagebox.showerror("错误", output.message)
+                    
+            except Exception as e:
+                progress_dialog.close()
+                logger.exception("编译异常")
+                messagebox.showerror("系统错误", str(e))
+        
+        self.root.after(100, do_compile)
     
     # ========== 模块操作 ==========
     
     def _add_hour_module(self) -> None:
-        """添加时辰模块"""
         selection_dialog = ModuleSelectionDialog(self.root, self.theme)
         hour_type = selection_dialog.show()
         
@@ -581,6 +734,7 @@ class PsalterApp:
             return
         
         try:
+            self._save_state()
             items = result.expand()
             for item in items:
                 self.content_manager.add(item)
@@ -594,11 +748,11 @@ class PsalterApp:
             messagebox.showerror("错误", f"展开模块失败: {str(e)}")
     
     def _add_imprimatur(self) -> None:
-        """添加Imprimatur/Nihil Obstat签名块"""
         dialog = ImprimaturDialog(self.root, self.theme)
         result = dialog.show()
         
         if result:
+            self._save_state()
             for item in result:
                 self.content_manager.add(item)
             

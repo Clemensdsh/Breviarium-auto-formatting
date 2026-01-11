@@ -233,7 +233,7 @@ class TitlePageDialog(BaseDialog):
         initial_data: TitlePageData,
         theme: Theme = DEFAULT_THEME
     ):
-        super().__init__(parent, "设置封面标题", "600x500", theme)
+        super().__init__(parent, "设置封面标题", "600x650", theme)
         self.result: Optional[TitlePageData] = None
         self.entries: Dict[str, tk.Text] = {}
         self._setup_ui(initial_data)
@@ -327,8 +327,121 @@ class CompileErrorDialog(BaseDialog):
         self._add_button(btn_frame, "关闭", lambda: self.top.destroy(), theme.RUBRIC_RED)
 
 
+
+
+class CompileProgressDialog:
+    """编译进度对话框 - 替代命令行输出"""
+    
+    def __init__(self, parent: tk.Widget, theme: Theme = DEFAULT_THEME):
+        self.theme = theme
+        self.cancelled = False
+        
+        self.top = tk.Toplevel(parent)
+        self.top.title("☩ 正在编译...")
+        self.top.geometry("500x350")
+        self.top.configure(bg=theme.BG_LIGHT)
+        self.top.transient(parent)
+        self.top.grab_set()
+        self.top.protocol("WM_DELETE_WINDOW", self._on_cancel)
+        
+        # 设置窗口图标
+        self._set_window_icon()
+        
+        # 居中
+        self.top.update_idletasks()
+        x = (self.top.winfo_screenwidth() // 2) - 250
+        y = (self.top.winfo_screenheight() // 2) - 175
+        self.top.geometry(f'+{x}+{y}')
+        
+        self._create_widgets()
+    
+    def _set_window_icon(self) -> None:
+        try:
+            from .icon import set_toplevel_icon
+            set_toplevel_icon(self.top)
+        except Exception:
+            pass
+    
+    def _create_widgets(self) -> None:
+        theme = self.theme
+        
+        main = tk.Frame(self.top, bg=theme.BG_LIGHT, padx=20, pady=20)
+        main.pack(fill=tk.BOTH, expand=True)
+        
+        # 标题
+        tk.Label(
+            main, text="☩ 正在编译文档", bg=theme.BG_LIGHT, fg=theme.RUBRIC_RED,
+            font=theme.get_font("title", bold=True)
+        ).pack(anchor='w', pady=(0, 15))
+        
+        # 当前状态
+        self.status_label = tk.Label(
+            main, text="准备中...", bg=theme.BG_LIGHT, fg=theme.TEXT,
+            font=theme.get_font(), anchor='w'
+        )
+        self.status_label.pack(fill=tk.X, pady=(0, 10))
+        
+        # 进度条
+        self.progress = ttk.Progressbar(main, mode='indeterminate', length=400)
+        self.progress.pack(fill=tk.X, pady=(0, 15))
+        self.progress.start(10)
+        
+        # 日志区域
+        tk.Label(
+            main, text="编译日志:", bg=theme.BG_LIGHT, fg=theme.TEXT_SEC,
+            font=theme.get_font("small")
+        ).pack(anchor='w')
+        
+        log_frame = tk.Frame(main, bg=theme.BORDER)
+        log_frame.pack(fill=tk.BOTH, expand=True, pady=(5, 15))
+        
+        self.log_text = tk.Text(
+            log_frame, bg=theme.BG_PANEL, fg=theme.TEXT,
+            font=theme.get_mono_font(), height=8,
+            borderwidth=0, highlightthickness=0, padx=8, pady=8
+        )
+        self.log_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=1, pady=1)
+        
+        scrollbar = ttk.Scrollbar(log_frame, orient=tk.VERTICAL, command=self.log_text.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.log_text.config(yscrollcommand=scrollbar.set, state=tk.DISABLED)
+        
+        # 取消按钮
+        cancel_btn = tk.Label(
+            main, text="取消", bg=theme.BG_HOVER, fg=theme.TEXT,
+            font=theme.get_font(), cursor='hand2', padx=20, pady=8
+        )
+        cancel_btn.pack(side=tk.RIGHT)
+        cancel_btn.bind('<Button-1>', lambda e: self._on_cancel())
+        cancel_btn.bind('<Enter>', lambda e: cancel_btn.config(bg=theme.darken(theme.BG_HOVER, 10)))
+        cancel_btn.bind('<Leave>', lambda e: cancel_btn.config(bg=theme.BG_HOVER))
+    
+    def update_message(self, message: str) -> None:
+        """更新状态消息"""
+        self.status_label.config(text=message)
+        
+        # 添加到日志
+        self.log_text.config(state=tk.NORMAL)
+        self.log_text.insert(tk.END, f"> {message}\n")
+        self.log_text.see(tk.END)
+        self.log_text.config(state=tk.DISABLED)
+        
+        self.top.update()
+    
+    def _on_cancel(self) -> None:
+        self.cancelled = True
+        self.close()
+    
+    def close(self) -> None:
+        try:
+            self.progress.stop()
+            self.top.destroy()
+        except:
+            pass
+
+
 class LoadingDialog:
-    """加载对话框"""
+    """简单加载对话框"""
     
     def __init__(self, parent: tk.Widget, message: str = "处理中...", theme: Theme = DEFAULT_THEME):
         self.top = tk.Toplevel(parent)
@@ -339,7 +452,6 @@ class LoadingDialog:
         self.top.grab_set()
         self.top.overrideredirect(True)
         
-        # 居中
         self.top.update_idletasks()
         x = (self.top.winfo_screenwidth() // 2) - 150
         y = (self.top.winfo_screenheight() // 2) - 50
@@ -357,6 +469,7 @@ class LoadingDialog:
     
     def close(self) -> None:
         self.top.destroy()
+
 
 
 class ScoreDialog(BaseDialog):

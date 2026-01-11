@@ -207,17 +207,23 @@ class PsalmWithAntiphonComponent(BaseComponent):
         self.initialize()
     
     def _create_slots(self) -> List[ModuleSlot]:
-        return [
+        slots = [
             ModuleSlot("antiphon", "antiphon", "Antiphona", "对经", True),
             ModuleSlot("psalm_title", "psalm_title", f"Psalmus {self.psalm_num}", f"圣咏 {self.psalm_num}", True),
-            ModuleSlot("psalm_content", "psalm", "Versus", "诗节", True),
-            ModuleSlot("gloria", "gloria", "Gloria Patri", "圣三光荣颂", required=False,
-                      default_content=ContentItem(
-                          item_type="gloria",
-                          latin="Glória Patri, et Fílio, * et Spirítui Sancto. Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.",
-                          chinese="愿光荣归于父、及子、及圣神。起初如何，今日亦然，直到永远。阿门。"
-                      )),
         ]
+        # 默认7个诗节插槽
+        for i in range(1, 8):
+            slots.append(ModuleSlot(
+                f"verse_{i}", "verse", f"Versus {i}", f"诗节 {i}", 
+                required=(i == 1)  # 只有第一个是必需的
+            ))
+        slots.append(ModuleSlot("gloria", "gloria", "Gloria Patri", "圣三光荣颂", required=False,
+                  default_content=ContentItem(
+                      item_type="gloria",
+                      latin="Glória Patri, et Fílio, * et Spirítui Sancto. Sicut erat in princípio, et nunc, et semper, * et in sǽcula sæculórum. Amen.",
+                      chinese="愿光荣归于父、及子、及圣神。起初如何，今日亦然，直到永远。阿门。"
+                  )))
+        return slots
     
     def expand(self) -> List[ContentItem]:
         items: List[ContentItem] = []
@@ -232,10 +238,11 @@ class PsalmWithAntiphonComponent(BaseComponent):
             title = title_slot.get_content()
             items.append(ContentItem(item_type="psalmtitle", latin=title.latin, chinese=title.chinese))
         
-        psalm_slot = self.get_slot("psalm_content")
-        if psalm_slot and psalm_slot.is_filled():
-            psalm = psalm_slot.get_content()
-            items.append(ContentItem(item_type="verse", latin=psalm.latin, chinese=psalm.chinese))
+        # 处理所有诗节插槽
+        for slot in self.slots:
+            if slot.slot_id.startswith("verse_") and slot.is_filled():
+                verse = slot.get_content()
+                items.append(ContentItem(item_type="verse", latin=verse.latin, chinese=verse.chinese))
         
         if self.show_gloria:
             gloria_slot = self.get_slot("gloria")

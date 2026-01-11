@@ -33,7 +33,7 @@ class ModuleSelectionDialog:
         
         self.dialog = tk.Toplevel(parent)
         self.dialog.title("选择时辰模块")
-        self.dialog.geometry("400x450")
+        self.dialog.geometry("400x550")  # 增加高度
         self.dialog.transient(parent)
         self.dialog.grab_set()
         self.dialog.configure(bg=theme.BG_LIGHT)
@@ -90,17 +90,23 @@ class ModuleSelectionDialog:
             bg=theme.BG_LIGHT, fg=theme.TEXT_SEC, font=theme.get_font("small")
         ).pack(anchor='w', pady=(0, 10))
         
-        # 时辰列表框架
+        # 时辰列表框架（带滚动条）
         list_frame = tk.Frame(main, bg=theme.BG_PANEL, highlightthickness=1, 
                              highlightbackground=theme.BORDER)
         list_frame.pack(fill=tk.BOTH, expand=True)
         
+        # 添加滚动条
+        scrollbar = ttk.Scrollbar(list_frame, orient=tk.VERTICAL)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
         self.hour_listbox = tk.Listbox(
             list_frame, font=theme.get_font(), selectmode=tk.SINGLE,
             bg=theme.BG_PANEL, fg=theme.TEXT, selectbackground=theme.RUBRIC_RED,
-            selectforeground="#FFFFFF", borderwidth=0, highlightthickness=0
+            selectforeground="#FFFFFF", borderwidth=0, highlightthickness=0,
+            yscrollcommand=scrollbar.set
         )
-        self.hour_listbox.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        self.hour_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        scrollbar.config(command=self.hour_listbox.yview)
         
         # 填充列表
         for hour_type in HourType:
@@ -439,17 +445,18 @@ class ModuleConfigDialog:
 
 
 class SlotEditDialog:
-    """插槽编辑对话框 - 编辑单个插槽的内容（统一风格）"""
+    """插槽编辑对话框 - 编辑单个插槽的内容（统一风格，支持类型选择）"""
     
-    def __init__(self, parent: tk.Tk, slot: ModuleSlot, theme: Theme):
+    def __init__(self, parent: tk.Tk, slot: ModuleSlot, theme: Theme, allow_type_change: bool = True):
         self.parent = parent
         self.slot = slot
         self.theme = theme
+        self.allow_type_change = allow_type_change
         self.result: Optional[ContentItem] = None
         
         self.dialog = tk.Toplevel(parent)
         self.dialog.title(f"编辑 - {slot.label_zh}")
-        self.dialog.geometry("600x450")
+        self.dialog.geometry("650x600")
         self.dialog.transient(parent)
         self.dialog.grab_set()
         self.dialog.configure(bg=theme.BG_LIGHT)
@@ -474,16 +481,51 @@ class SlotEditDialog:
         main_frame = tk.Frame(self.dialog, bg=theme.BG_LIGHT, padx=15, pady=15)
         main_frame.pack(fill=tk.BOTH, expand=True)
         
-        # 信息
-        info_frame = tk.Frame(main_frame, bg=theme.BG_DARK, padx=10, pady=8)
-        info_frame.pack(fill=tk.X, pady=(0, 10))
+        # 类型选择（可选）
+        type_frame = tk.Frame(main_frame, bg=theme.BG_DARK, padx=10, pady=8)
+        type_frame.pack(fill=tk.X, pady=(0, 10))
         
         tk.Label(
-            info_frame,
-            text=f"类型: {self.slot.slot_type} | {self.slot.label_lat}",
-            bg=theme.BG_DARK, fg=theme.TEXT_SEC,
-            font=theme.get_font("small")
-        ).pack(anchor=tk.W)
+            type_frame, text="类型:",
+            bg=theme.BG_DARK, fg=theme.RUBRIC_RED,
+            font=theme.get_font("normal", bold=True)
+        ).pack(side=tk.LEFT, padx=(0, 10))
+        
+        # 获取格式类型列表
+        from .models import FORMAT_TYPE_NAMES
+        self.format_types = [(k, f"{k} - {v}") for k, v in FORMAT_TYPE_NAMES.items()]
+        
+        self.type_var = tk.StringVar()
+        
+        if self.allow_type_change:
+            # 下拉框选择类型
+            self.type_combo = ttk.Combobox(
+                type_frame, textvariable=self.type_var,
+                values=[display for _, display in self.format_types],
+                state='readonly', width=35
+            )
+            self.type_combo.pack(side=tk.LEFT, fill=tk.X, expand=True)
+            
+            # 设置默认值
+            default_type = self.slot.slot_type
+            for i, (type_key, _) in enumerate(self.format_types):
+                if type_key == default_type:
+                    self.type_combo.current(i)
+                    break
+            else:
+                # 如果没找到匹配的，选择text
+                for i, (type_key, _) in enumerate(self.format_types):
+                    if type_key == "text":
+                        self.type_combo.current(i)
+                        break
+        else:
+            # 只读显示
+            tk.Label(
+                type_frame,
+                text=f"{self.slot.slot_type} | {self.slot.label_lat}",
+                bg=theme.BG_DARK, fg=theme.TEXT_SEC,
+                font=theme.get_font()
+            ).pack(side=tk.LEFT)
         
         # 拉丁文
         tk.Label(
@@ -526,6 +568,12 @@ class SlotEditDialog:
         if content:
             self.latin_text.insert(tk.END, content.latin)
             self.chinese_text.insert(tk.END, content.chinese)
+            # 如果有内容，使用内容的类型
+            if self.allow_type_change and hasattr(content, 'item_type'):
+                for i, (type_key, _) in enumerate(self.format_types):
+                    if type_key == content.item_type:
+                        self.type_combo.current(i)
+                        break
         
         # 按钮
         btn_frame = tk.Frame(self.dialog, bg=theme.BG_LIGHT)
@@ -569,20 +617,29 @@ class SlotEditDialog:
         chinese = self.chinese_text.get("1.0", tk.END).strip()
         
         if latin or chinese:
-            # 根据slot类型确定item_type
-            type_mapping = {
-                "antiphon": "antiphon",
-                "psalm": "verse",
-                "psalm_title": "psalmtitle",
-                "lesson_title": "lesson",
-                "text": "text",
-                "versicle": "V",
-                "responsory": "text",
-                "rubric": "rubric",
-                "gloria": "gloria",
-                "preces": "text",
-            }
-            item_type = type_mapping.get(self.slot.slot_type, "text")
+            # 获取选择的类型
+            if self.allow_type_change and hasattr(self, 'type_combo'):
+                type_str = self.type_var.get()
+                if type_str and " - " in type_str:
+                    item_type = type_str.split(" - ")[0]
+                else:
+                    item_type = self.slot.slot_type
+            else:
+                # 根据slot类型确定item_type
+                type_mapping = {
+                    "antiphon": "antiphon",
+                    "psalm": "verse",
+                    "psalm_title": "psalmtitle",
+                    "lesson_title": "lesson",
+                    "text": "text",
+                    "versicle": "V",
+                    "responsory": "text",
+                    "rubric": "rubric",
+                    "gloria": "gloria",
+                    "preces": "text",
+                    "verse": "verse",
+                }
+                item_type = type_mapping.get(self.slot.slot_type, "text")
             
             self.result = ContentItem(
                 item_type=item_type,
@@ -624,7 +681,7 @@ class ModuleEditorDialog:
         
         self.dialog = tk.Toplevel(parent)
         self.dialog.title(f"编辑模块 - {module.name_zh}")
-        self.dialog.geometry("800x600")
+        self.dialog.geometry("950x750")
         self.dialog.transient(parent)
         self.dialog.grab_set()
         self.dialog.configure(bg=theme.BG_LIGHT)
@@ -723,29 +780,73 @@ class ModuleEditorDialog:
         self.tree.bind('<Double-1>', self._on_tree_double_click)
         self.tree.bind('<<TreeviewSelect>>', self._on_tree_select)
         
-        # 左侧按钮
+        # 左侧按钮 - 第一行
         left_btn_frame = tk.Frame(left_frame, bg=theme.BG_LIGHT)
         left_btn_frame.pack(fill=tk.X, pady=(8, 0))
         
         edit_btn = tk.Label(
             left_btn_frame, text="编辑", 
             bg=theme.RUBRIC_RED, fg="#FFFFFF",
-            font=theme.get_font(), cursor='hand2', padx=15, pady=5
+            font=theme.get_font(), cursor='hand2', padx=12, pady=5
         )
-        edit_btn.pack(side=tk.LEFT, padx=(0, 5))
+        edit_btn.pack(side=tk.LEFT, padx=(0, 3))
         edit_btn.bind('<Button-1>', lambda e: self._edit_selected())
         edit_btn.bind('<Enter>', lambda e: edit_btn.config(bg=theme.RUBRIC_DARK))
         edit_btn.bind('<Leave>', lambda e: edit_btn.config(bg=theme.RUBRIC_RED))
         
         add_btn = tk.Label(
-            left_btn_frame, text="添加自定义", 
+            left_btn_frame, text="+同类", 
             bg=theme.BG_HOVER, fg=theme.TEXT,
-            font=theme.get_font(), cursor='hand2', padx=15, pady=5
+            font=theme.get_font(), cursor='hand2', padx=12, pady=5
         )
-        add_btn.pack(side=tk.LEFT)
-        add_btn.bind('<Button-1>', lambda e: self._add_custom())
+        add_btn.pack(side=tk.LEFT, padx=(0, 3))
+        add_btn.bind('<Button-1>', lambda e: self._add_similar())
         add_btn.bind('<Enter>', lambda e: add_btn.config(bg=theme.darken(theme.BG_HOVER, 10)))
         add_btn.bind('<Leave>', lambda e: add_btn.config(bg=theme.BG_HOVER))
+        
+        custom_btn = tk.Label(
+            left_btn_frame, text="+自定义", 
+            bg=theme.BG_HOVER, fg=theme.TEXT,
+            font=theme.get_font(), cursor='hand2', padx=12, pady=5
+        )
+        custom_btn.pack(side=tk.LEFT, padx=(0, 3))
+        custom_btn.bind('<Button-1>', lambda e: self._add_custom())
+        custom_btn.bind('<Enter>', lambda e: custom_btn.config(bg=theme.darken(theme.BG_HOVER, 10)))
+        custom_btn.bind('<Leave>', lambda e: custom_btn.config(bg=theme.BG_HOVER))
+        
+        del_btn = tk.Label(
+            left_btn_frame, text="删除", 
+            bg="#D32F2F", fg="#FFFFFF",
+            font=theme.get_font(), cursor='hand2', padx=12, pady=5
+        )
+        del_btn.pack(side=tk.LEFT)
+        del_btn.bind('<Button-1>', lambda e: self._delete_selected())
+        del_btn.bind('<Enter>', lambda e: del_btn.config(bg="#B71C1C"))
+        del_btn.bind('<Leave>', lambda e: del_btn.config(bg="#D32F2F"))
+        
+        # 左侧按钮 - 第二行（上移/下移）
+        left_btn_frame2 = tk.Frame(left_frame, bg=theme.BG_LIGHT)
+        left_btn_frame2.pack(fill=tk.X, pady=(5, 0))
+        
+        up_btn = tk.Label(
+            left_btn_frame2, text="↑ 上移", 
+            bg=theme.BG_HOVER, fg=theme.TEXT,
+            font=theme.get_font(), cursor='hand2', padx=12, pady=5
+        )
+        up_btn.pack(side=tk.LEFT, padx=(0, 3))
+        up_btn.bind('<Button-1>', lambda e: self._move_up())
+        up_btn.bind('<Enter>', lambda e: up_btn.config(bg=theme.darken(theme.BG_HOVER, 10)))
+        up_btn.bind('<Leave>', lambda e: up_btn.config(bg=theme.BG_HOVER))
+        
+        down_btn = tk.Label(
+            left_btn_frame2, text="↓ 下移", 
+            bg=theme.BG_HOVER, fg=theme.TEXT,
+            font=theme.get_font(), cursor='hand2', padx=12, pady=5
+        )
+        down_btn.pack(side=tk.LEFT)
+        down_btn.bind('<Button-1>', lambda e: self._move_down())
+        down_btn.bind('<Enter>', lambda e: down_btn.config(bg=theme.darken(theme.BG_HOVER, 10)))
+        down_btn.bind('<Leave>', lambda e: down_btn.config(bg=theme.BG_HOVER))
         
         # 右侧 - 预览
         right_frame = tk.Frame(paned, bg=theme.BG_LIGHT)
@@ -777,6 +878,67 @@ class ModuleEditorDialog:
             pady=10
         )
         self.preview_text.pack(fill=tk.BOTH, expand=True)
+        
+        # 绑定快捷键
+        self._bind_shortcuts()
+    
+    def _bind_shortcuts(self) -> None:
+        """绑定快捷键到对话框和树"""
+        # 绑定到对话框
+        for key in ['z', 'Z']:
+            self.dialog.bind(f'<Control-{key}>', lambda e: None)  # 模块编辑暂不支持撤销
+        for key in ['c', 'C']:
+            self.dialog.bind(f'<Control-{key}>', lambda e: self._copy_slot())
+        for key in ['v', 'V']:
+            self.dialog.bind(f'<Control-{key}>', lambda e: self._paste_slot())
+        self.dialog.bind('<Delete>', lambda e: self._delete_selected())
+        
+        # 绑定到树
+        for key in ['c', 'C']:
+            self.tree.bind(f'<Control-{key}>', lambda e: self._copy_slot())
+        for key in ['v', 'V']:
+            self.tree.bind(f'<Control-{key}>', lambda e: self._paste_slot())
+        self.tree.bind('<Delete>', lambda e: self._delete_selected())
+    
+    def _copy_slot(self) -> None:
+        """复制选中的插槽内容"""
+        selection = self.tree.selection()
+        if not selection:
+            return
+        
+        item = selection[0]
+        tags = self.tree.item(item, "tags")
+        
+        if len(tags) >= 2:
+            comp_id, slot_id = tags[0], tags[1]
+            comp = self.module.get_component(comp_id)
+            if comp:
+                slot = comp.get_slot(slot_id)
+                if slot and slot.is_filled():
+                    import copy
+                    self._clipboard_slot = copy.deepcopy(slot)
+    
+    def _paste_slot(self) -> None:
+        """粘贴插槽内容到选中位置"""
+        if not hasattr(self, '_clipboard_slot') or not self._clipboard_slot:
+            return
+        
+        selection = self.tree.selection()
+        if not selection:
+            return
+        
+        item = selection[0]
+        tags = self.tree.item(item, "tags")
+        
+        if len(tags) >= 2:
+            comp_id, slot_id = tags[0], tags[1]
+            comp = self.module.get_component(comp_id)
+            if comp:
+                slot = comp.get_slot(slot_id)
+                if slot:
+                    slot.content = self._clipboard_slot.get_content()
+                    self._populate_tree()
+                    self._select_slot_in_tree(comp_id, slot_id)
     
     def _populate_tree(self) -> None:
         """填充组件树"""
@@ -867,6 +1029,128 @@ class ModuleEditorDialog:
                 if result:
                     comp.add_custom_item(result)
                     messagebox.showinfo("成功", "自定义内容已添加")
+    
+    def _add_similar(self) -> None:
+        """添加与选中项相同类型的新项（插入到当前项之后）"""
+        selection = self.tree.selection()
+        if not selection:
+            messagebox.showinfo("提示", "请先选择一个项目")
+            return
+        
+        item = selection[0]
+        tags = self.tree.item(item, "tags")
+        
+        if len(tags) >= 2:
+            comp_id, slot_id = tags[0], tags[1]
+            comp = self.module.get_component(comp_id)
+            if comp:
+                slot = comp.get_slot(slot_id)
+                if slot:
+                    # 找到当前插槽的位置
+                    current_idx = -1
+                    for i, s in enumerate(comp.slots):
+                        if s.slot_id == slot_id:
+                            current_idx = i
+                            break
+                    
+                    # 创建相同类型的新插槽
+                    new_slot = ModuleSlot(
+                        slot_id=f"{slot.slot_type}_custom_{len(comp.slots)}",
+                        slot_type=slot.slot_type,
+                        label_lat=f"{slot.label_lat} (新)",
+                        label_zh=f"{slot.label_zh} (新)",
+                        required=False
+                    )
+                    
+                    # 插入到当前项之后
+                    if current_idx >= 0:
+                        comp.slots.insert(current_idx + 1, new_slot)
+                    else:
+                        comp.slots.append(new_slot)
+                    
+                    self._populate_tree()
+                    messagebox.showinfo("成功", f"已添加新的 {slot.label_zh}")
+    
+    def _move_up(self) -> None:
+        """上移选中的插槽"""
+        selection = self.tree.selection()
+        if not selection:
+            return
+        
+        item = selection[0]
+        tags = self.tree.item(item, "tags")
+        
+        if len(tags) >= 2:
+            comp_id, slot_id = tags[0], tags[1]
+            comp = self.module.get_component(comp_id)
+            if comp:
+                for i, slot in enumerate(comp.slots):
+                    if slot.slot_id == slot_id and i > 0:
+                        comp.slots[i], comp.slots[i-1] = comp.slots[i-1], comp.slots[i]
+                        self._populate_tree()
+                        # 重新选中移动后的项
+                        self._select_slot_in_tree(comp_id, slot_id)
+                        return
+    
+    def _move_down(self) -> None:
+        """下移选中的插槽"""
+        selection = self.tree.selection()
+        if not selection:
+            return
+        
+        item = selection[0]
+        tags = self.tree.item(item, "tags")
+        
+        if len(tags) >= 2:
+            comp_id, slot_id = tags[0], tags[1]
+            comp = self.module.get_component(comp_id)
+            if comp:
+                for i, slot in enumerate(comp.slots):
+                    if slot.slot_id == slot_id and i < len(comp.slots) - 1:
+                        comp.slots[i], comp.slots[i+1] = comp.slots[i+1], comp.slots[i]
+                        self._populate_tree()
+                        # 重新选中移动后的项
+                        self._select_slot_in_tree(comp_id, slot_id)
+                        return
+    
+    def _select_slot_in_tree(self, comp_id: str, slot_id: str) -> None:
+        """在树中选中指定的插槽"""
+        def find_and_select(parent=""):
+            for item in self.tree.get_children(parent):
+                tags = self.tree.item(item, "tags")
+                if len(tags) >= 2 and tags[0] == comp_id and tags[1] == slot_id:
+                    self.tree.selection_set(item)
+                    self.tree.see(item)
+                    return True
+                if find_and_select(item):
+                    return True
+            return False
+        find_and_select()
+    
+    def _delete_selected(self) -> None:
+        """删除选中的项目"""
+        selection = self.tree.selection()
+        if not selection:
+            messagebox.showinfo("提示", "请先选择要删除的项目")
+            return
+        
+        item = selection[0]
+        tags = self.tree.item(item, "tags")
+        
+        if len(tags) >= 2:
+            comp_id, slot_id = tags[0], tags[1]
+            comp = self.module.get_component(comp_id)
+            if comp:
+                # 找到并删除插槽
+                for i, slot in enumerate(comp.slots):
+                    if slot.slot_id == slot_id:
+                        if slot.required:
+                            if not messagebox.askyesno("确认", f"'{slot.label_zh}' 是必需项，确定要删除吗？"):
+                                return
+                        del comp.slots[i]
+                        self._populate_tree()
+                        messagebox.showinfo("成功", "已删除")
+                        return
     
     def _show_slot_preview(self, slot: ModuleSlot) -> None:
         """显示插槽预览"""
