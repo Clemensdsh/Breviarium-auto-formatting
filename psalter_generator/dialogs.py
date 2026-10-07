@@ -36,9 +36,6 @@ class BaseDialog:
         self.top.transient(parent)
         self.top.grab_set()
         
-        # 设置窗口图标
-        self._set_window_icon()
-        
         # 居中显示
         self.top.update_idletasks()
         width = self.top.winfo_width()
@@ -46,15 +43,7 @@ class BaseDialog:
         x = (self.top.winfo_screenwidth() // 2) - (width // 2)
         y = (self.top.winfo_screenheight() // 2) - (height // 2)
         self.top.geometry(f'+{x}+{y}')
-    
-    def _set_window_icon(self) -> None:
-        """设置窗口图标"""
-        try:
-            from .icon import set_toplevel_icon
-            set_toplevel_icon(self.top)
-        except Exception:
-            pass
-    
+
     def _create_button_frame(self) -> tk.Frame:
         frame = tk.Frame(self.top, bg=self.theme.BG_LIGHT)
         frame.pack(side=tk.BOTTOM, fill=tk.X, padx=15, pady=15)
@@ -344,9 +333,6 @@ class CompileProgressDialog:
         self.top.grab_set()
         self.top.protocol("WM_DELETE_WINDOW", self._on_cancel)
         
-        # 设置窗口图标
-        self._set_window_icon()
-        
         # 居中
         self.top.update_idletasks()
         x = (self.top.winfo_screenwidth() // 2) - 250
@@ -354,14 +340,7 @@ class CompileProgressDialog:
         self.top.geometry(f'+{x}+{y}')
         
         self._create_widgets()
-    
-    def _set_window_icon(self) -> None:
-        try:
-            from .icon import set_toplevel_icon
-            set_toplevel_icon(self.top)
-        except Exception:
-            pass
-    
+
     def _create_widgets(self) -> None:
         theme = self.theme
         
@@ -438,37 +417,6 @@ class CompileProgressDialog:
             self.top.destroy()
         except:
             pass
-
-
-class LoadingDialog:
-    """简单加载对话框"""
-    
-    def __init__(self, parent: tk.Widget, message: str = "处理中...", theme: Theme = DEFAULT_THEME):
-        self.top = tk.Toplevel(parent)
-        self.top.title("请稍候")
-        self.top.geometry("300x100")
-        self.top.configure(bg=theme.BG_LIGHT)
-        self.top.transient(parent)
-        self.top.grab_set()
-        self.top.overrideredirect(True)
-        
-        self.top.update_idletasks()
-        x = (self.top.winfo_screenwidth() // 2) - 150
-        y = (self.top.winfo_screenheight() // 2) - 50
-        self.top.geometry(f'+{x}+{y}')
-        
-        self.label = tk.Label(
-            self.top, text=message, font=theme.get_font(),
-            bg=theme.BG_LIGHT, fg=theme.TEXT
-        )
-        self.label.pack(expand=True)
-    
-    def update_message(self, message: str) -> None:
-        self.label.config(text=message)
-        self.top.update()
-    
-    def close(self) -> None:
-        self.top.destroy()
 
 
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 compiler_service.py - LaTeX编译服务
-负责调用XeLaTeX编译并管理构建目录
+负责调用LuaLaTeX编译并管理构建目录
 支持超时控制和更详细的错误报告
 """
 
@@ -20,7 +20,6 @@ from pathlib import Path
 from .models import TitlePageData, ContentItem
 from .latex_generator import MainTexGenerator, BodyTexGenerator
 from .config import AppConfig
-from .exceptions import CompileError, FileError
 
 logger = logging.getLogger(__name__)
 
@@ -48,13 +47,6 @@ class CompileOutput:
     @property
     def is_success(self) -> bool:
         return self.result == CompileResult.SUCCESS
-    
-    def get_summary(self) -> str:
-        """获取结果摘要"""
-        lines = [f"结果: {self.result.value}", self.message]
-        if self.warnings:
-            lines.append(f"警告: {len(self.warnings)} 条")
-        return "\n".join(lines)
 
 
 class BuildDirectoryManager:
@@ -209,10 +201,6 @@ class LaTeXCompiler:
         except Exception as e:
             logger.error(f"编译异常: {e}")
             return False, str(e), warnings
-
-
-# 保留旧名称以兼容
-XeLatexCompiler = LaTeXCompiler
 
 
 class PDFViewer:

@@ -6,7 +6,6 @@ content_manager.py - 内容管理器
 """
 
 from __future__ import annotations
-import os
 import re
 import csv
 import logging
@@ -252,25 +251,7 @@ class ContentManager:
                     writer.writerow(row)
             logger.info(f"已保存CSV: {filepath}")
         except IOError as e:
-            raise FileError(f"保存CSV失败", filepath, str(e))
-    
-    def load_from_csv(self, filepath: str) -> None:
-        """从CSV文件加载"""
-        try:
-            self._items.clear()
-            with open(filepath, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f)
-                for row in reader:
-                    if len(row) >= 3:
-                        self._items.append(ContentItem(
-                            item_type=row[0],
-                            latin=row[1],
-                            chinese=row[2],
-                            arg=row[3] if len(row) > 3 else ""
-                        ))
-            logger.info(f"已从CSV加载 {len(self._items)} 项: {filepath}")
-        except IOError as e:
-            raise FileError(f"加载CSV失败", filepath, str(e))
+            raise FileError("保存CSV失败", filepath, str(e))
     
     def to_preview_text(self) -> str:
         """生成预览文本（CSV格式）"""

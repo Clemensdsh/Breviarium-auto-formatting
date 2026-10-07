@@ -128,7 +128,6 @@ class SmoothPanedWindow(tk.Frame):
         
         self._dragging = False
         self._drag_start_x = 0
-        self._initial_layout_done = False
     
     def _on_configure(self, event: tk.Event) -> None:
         """窗口大小改变时重新布局"""
@@ -155,8 +154,6 @@ class SmoothPanedWindow(tk.Frame):
         self.left_frame.place(x=0, y=0, width=left_width, height=total_height)
         self.sash.place(x=sash_x, y=0, width=self.sash_width, height=total_height)
         self.right_frame.place(x=right_x, y=0, width=right_width, height=total_height)
-        
-        self._initial_layout_done = True
     
     def _start_drag(self, event: tk.Event) -> None:
         self._dragging = True

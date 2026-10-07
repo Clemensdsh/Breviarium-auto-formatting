@@ -8,7 +8,7 @@ latex_generator.py - LaTeX内容生成器
 
 from __future__ import annotations
 import logging
-from typing import List, Optional, Protocol
+from typing import List, Optional
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 # ==========================================
 # 状态机
 # ==========================================
+
 
 class ColumnMode(Enum):
     """分栏模式"""
@@ -66,6 +67,7 @@ class GeneratorState:
 # ==========================================
 # 内容项渲染器（策略模式）
 # ==========================================
+
 
 class ItemRenderer(ABC):
     """内容项渲染器基类"""
@@ -247,6 +249,7 @@ class ScoreItemRenderer(ItemRenderer):
 # 主生成器
 # ==========================================
 
+
 class TexGenerator:
     """LaTeX内容生成器"""
     
@@ -311,6 +314,7 @@ class TexGenerator:
 # 模板生成器
 # ==========================================
 
+
 class MainTexGenerator:
     """主文档生成器 - 处理main.tex模板"""
     
@@ -333,7 +337,7 @@ class MainTexGenerator:
                     self._template_content = f.read()
                 logger.debug(f"已加载模板: {self.template_path}")
             except IOError as e:
-                raise TemplateError(f"无法加载模板", self.template_path, str(e))
+                raise TemplateError("无法加载模板", self.template_path, str(e))
         return self._template_content
     
     def generate(self, title_data: TitlePageData) -> str:
@@ -346,10 +350,6 @@ class MainTexGenerator:
             content = content.replace(placeholder, value)
         
         return content
-    
-    def reload_template(self) -> None:
-        """强制重新加载模板"""
-        self._template_content = None
 
 
 class BodyTexGenerator:
@@ -373,4 +373,4 @@ class BodyTexGenerator:
                 f.write(content)
             logger.info(f"已保存body.tex: {filepath}")
         except IOError as e:
-            raise TemplateError(f"保存文件失败", filepath, str(e))
+            raise TemplateError("保存文件失败", filepath, str(e))

@@ -8,19 +8,11 @@ module_dialogs.py - 时辰模块配置对话框
 from __future__ import annotations
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
-from typing import Optional, Dict, List, Callable, Any, TYPE_CHECKING
+from typing import Optional, List
 
-from .modules import (
-    HourType, HourModule, ModuleConfig,
-    create_hour_module, HOUR_TYPE_NAMES, COMPONENT_TYPE_NAMES,
-    BaseComponent, ModuleSlot, PsalmWithAntiphonComponent, 
-    LessonWithResponsoryComponent
-)
-from .models import ContentItem, ModuleItem
+from .modules import HourType, HourModule, ModuleConfig, HOUR_TYPE_NAMES, ModuleSlot
+from .models import ContentItem
 from .theme import Theme
-
-if TYPE_CHECKING:
-    from .app import PsalterApp
 
 
 class ModuleSelectionDialog:
@@ -38,40 +30,9 @@ class ModuleSelectionDialog:
         self.dialog.grab_set()
         self.dialog.configure(bg=theme.BG_LIGHT)
         
-        # 设置窗口图标
-        self._set_window_icon()
-        
         self._create_widgets()
         self._center_dialog()
-    
-    def _set_window_icon(self) -> None:
-        """设置窗口图标"""
-        try:
-            import os, sys
-            if hasattr(sys, '_MEIPASS'):
-                # PyInstaller 打包后，资源在临时目录 _MEIPASS 中
-                base_dir = sys._MEIPASS
-            else:
-                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            
-            icon_paths = [
-                os.path.join(base_dir, 'cross_of_saint_stephen.png'),
-                os.path.join(base_dir, 'Cross_of_saint_stephen.png'),
-                os.path.join(base_dir, 'maltese_cross.ico'),
-                os.path.join(base_dir, 'maltese_cross.png'),
-            ]
-            
-            for icon_path in icon_paths:
-                if os.path.exists(icon_path):
-                    if icon_path.endswith('.ico'):
-                        self.dialog.iconbitmap(icon_path)
-                    else:
-                        photo = tk.PhotoImage(file=icon_path)
-                        self.dialog.iconphoto(False, photo)
-                    break
-        except Exception:
-            pass
-    
+
     def _create_widgets(self) -> None:
         theme = self.theme
         
@@ -223,20 +184,9 @@ class ModuleConfigDialog:
         self.dialog.grab_set()
         self.dialog.configure(bg=theme.BG_LIGHT)
         
-        # 设置窗口图标
-        self._set_window_icon()
-        
         self._create_widgets()
         self._center_dialog()
-    
-    def _set_window_icon(self) -> None:
-        """设置窗口图标"""
-        try:
-            from .icon import set_toplevel_icon
-            set_toplevel_icon(self.dialog)
-        except Exception:
-            pass
-    
+
     def _create_widgets(self) -> None:
         theme = self.theme
         
@@ -461,20 +411,9 @@ class SlotEditDialog:
         self.dialog.grab_set()
         self.dialog.configure(bg=theme.BG_LIGHT)
         
-        # 设置窗口图标
-        self._set_window_icon()
-        
         self._create_widgets()
         self._center_dialog()
-    
-    def _set_window_icon(self) -> None:
-        """设置窗口图标"""
-        try:
-            from .icon import set_toplevel_icon
-            set_toplevel_icon(self.dialog)
-        except Exception:
-            pass
-    
+
     def _create_widgets(self) -> None:
         theme = self.theme
         
@@ -686,21 +625,10 @@ class ModuleEditorDialog:
         self.dialog.grab_set()
         self.dialog.configure(bg=theme.BG_LIGHT)
         
-        # 设置窗口图标
-        self._set_window_icon()
-        
         self._create_widgets()
         self._populate_tree()
         self._center_dialog()
-    
-    def _set_window_icon(self) -> None:
-        """设置窗口图标"""
-        try:
-            from .icon import set_toplevel_icon
-            set_toplevel_icon(self.dialog)
-        except Exception:
-            pass
-    
+
     def _create_widgets(self) -> None:
         theme = self.theme
         
@@ -1225,20 +1153,9 @@ class ImprimaturDialog:
         self.dialog.grab_set()
         self.dialog.configure(bg=theme.BG_LIGHT)
         
-        # 设置窗口图标
-        self._set_window_icon()
-        
         self._create_widgets()
         self._center_dialog()
-    
-    def _set_window_icon(self) -> None:
-        """设置窗口图标"""
-        try:
-            from .icon import set_toplevel_icon
-            set_toplevel_icon(self.dialog)
-        except Exception:
-            pass
-    
+
     def _create_widgets(self) -> None:
         theme = self.theme
         
