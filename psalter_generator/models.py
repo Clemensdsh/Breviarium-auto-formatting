@@ -7,43 +7,8 @@ models.py - 数据模型定义
 
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Tuple
-from enum import Enum
+from typing import List, Dict, Tuple
 import os
-
-
-class ContentType(Enum):
-    """内容类型枚举"""
-    H1 = "h1"
-    H1CAP = "h1cap"
-    H1LOWERCASE = "h1lowercase"
-    H2 = "h2"
-    H3 = "h3"
-    PSALMTITLE = "psalmtitle"
-    CANTICLETITLE = "canticletitle"
-    HYMNTITLE = "hymntitle"
-    HYMNHEADER = "hymnheader"
-    ANTIPHON = "antiphon"
-    ANTIPHONNUM = "antiphonnum"
-    DROPCAP = "dropcap"
-    VERSE = "verse"
-    GLORIA = "gloria"
-    RUBRIC = "rubric"
-    V = "V"
-    R = "R"
-    HYMN = "hymn"
-    CAPIT = "capit"
-    CAPITHEADER = "capitheader"
-    SCRIPTUREREF = "scriptureref"
-    COLLECT = "collect"
-    LESSON = "lesson"
-    TEXT = "text"
-    RULE = "rule"
-    THICKRULE = "thickrule"
-    PAGEBREAK = "pagebreak"
-    TOCSTART = "tocstart"
-    SINGLECOL = "singlecol"
-    IMAGE = "image"
 
 
 # 格式类型显示名称映射
@@ -211,15 +176,6 @@ class TitlePageData:
             "footer": self.footer,
         }
 
-    @classmethod
-    def from_dict(cls, data: Dict[str, str]) -> TitlePageData:
-        return cls(
-            title_zh=data.get("title_zh", ""),
-            title_lat=data.get("title_lat", ""),
-            edition=data.get("edition", ""),
-            footer=data.get("footer", ""),
-        )
-    
     def validate(self) -> Tuple[bool, str]:
         """验证封面数据"""
         if not self.title_zh and not self.title_lat:
@@ -268,13 +224,3 @@ class ModuleItem:
             "display_name": self.display_name,
             "config_data": self.config_data,
         }
-    
-    @classmethod
-    def from_dict(cls, data: Dict) -> ModuleItem:
-        """从字典反序列化"""
-        return cls(
-            module_type=data.get("module_type", ""),
-            module_id=data.get("module_id", ""),
-            display_name=data.get("display_name", ""),
-            config_data=data.get("config_data", {}),
-        )

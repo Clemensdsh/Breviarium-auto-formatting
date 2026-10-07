@@ -7,11 +7,10 @@ Psalter LaTeX Generator - Magnificat风格界面
 
 from __future__ import annotations
 import os
-import sys
 import shutil
 import logging
 import tkinter as tk
-from tkinter import filedialog, messagebox, simpledialog
+from tkinter import filedialog, messagebox
 from typing import Optional, List
 import copy
 
@@ -34,25 +33,11 @@ from .module_dialogs import (
     ModuleSelectionDialog, ModuleConfigDialog, 
     ModuleEditorDialog, ImprimaturDialog
 )
-from .modules import HourType, HourModule, ModuleConfig, create_hour_module
+from .modules import create_hour_module
+from .paths import RESOURCE_DIR, WORKING_DIR
+from .icon import set_icon
 
 logger = logging.getLogger(__name__)
-
-
-def get_resource_path() -> str:
-    """获取资源文件目录（兼容PyInstaller打包）"""
-    if hasattr(sys, '_MEIPASS'):
-        return sys._MEIPASS
-    else:
-        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-def get_working_path() -> str:
-    """获取工作目录（exe所在目录，用于输出文件）"""
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.dirname(sys.executable)
-    else:
-        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def ensure_external_content(resource_dir: str, working_dir: str) -> str:
@@ -87,8 +72,8 @@ class PsalterApp:
         self.button_factory = ButtonFactory(theme)
         
         # 路径
-        self.resource_dir = get_resource_path()
-        self.working_dir = get_working_path()
+        self.resource_dir = RESOURCE_DIR
+        self.working_dir = WORKING_DIR
         
         # 使用外部content文件夹
         self.content_dir = ensure_external_content(self.resource_dir, self.working_dir)
@@ -137,15 +122,8 @@ class PsalterApp:
         self.root.minsize(900, 700)
         self.root.configure(bg=self.theme.BG_DARK)
         
-        self.root.after(100, self._set_window_icon)
-    
-    def _set_window_icon(self) -> None:
-        try:
-            from .icon import set_window_icon
-            set_window_icon(self.root)
-        except Exception as e:
-            logger.warning(f"设置窗口图标失败: {e}")
-    
+        self.root.after(100, lambda: set_icon(self.root, default=True))
+
     def _setup_ui(self) -> None:
         main = tk.Frame(self.root, bg=self.theme.BG_DARK)
         main.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)

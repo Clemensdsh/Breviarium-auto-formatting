@@ -1,88 +1,21 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-icon.py - 应用程序图标
-圣斯德望十字架 (Cross of Saint Stephen) 图标
-"""
+"""窗口图标（圣斯德望十字架）"""
 
+import logging
 import os
-import sys
 import tkinter as tk
-from typing import Optional
 
-# 全局缓存，避免重复加载
-_icon_photo: Optional[tk.PhotoImage] = None
-_icon_path: Optional[str] = None
+from .paths import ICON_PATH
 
-
-def _get_base_dir() -> str:
-    """获取资源文件基础路径（兼容PyInstaller打包）"""
-    if hasattr(sys, '_MEIPASS'):
-        # PyInstaller 打包后，资源在临时目录 _MEIPASS 中
-        return sys._MEIPASS
-    else:
-        # 开发环境
-        return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+logger = logging.getLogger(__name__)
 
 
-def get_icon_path() -> Optional[str]:
-    """获取图标文件路径"""
-    global _icon_path
-    
-    if _icon_path is not None:
-        return _icon_path
-    
-    base_dir = _get_base_dir()
-    
-    # 只使用 cross_of_saint_stephen.png
-    icon_candidates = [
-        'cross_of_saint_stephen.png',
-        'Cross_of_saint_stephen.png',
-    ]
-    
-    for icon_name in icon_candidates:
-        icon_path = os.path.join(base_dir, icon_name)
-        if os.path.exists(icon_path):
-            _icon_path = icon_path
-            return _icon_path
-    
-    return None
-
-
-def set_window_icon(root: tk.Tk) -> None:
-    """
-    设置主窗口图标为圣斯德望十字架
-    """
-    global _icon_photo
-    
+def set_icon(window: tk.Wm, default: bool = False) -> None:
+    """为窗口设置图标；default=True 时同时作为后续所有窗口的默认图标"""
+    if not os.path.exists(ICON_PATH):
+        return
     try:
-        icon_path = get_icon_path()
-        if icon_path:
-            # 确保窗口已经映射
-            root.update_idletasks()
-            # 创建新的PhotoImage并保存引用
-            _icon_photo = tk.PhotoImage(file=icon_path)
-            root.iconphoto(True, _icon_photo)
-            # 同时保存到root对象防止被回收
-            root._icon_photo = _icon_photo
-        else:
-            print("警告: 未找到图标文件 cross_of_saint_stephen.png")
-    except Exception as e:
-        print(f"设置窗口图标失败: {e}")
-
-
-def set_toplevel_icon(toplevel: tk.Toplevel) -> None:
-    """
-    设置Toplevel窗口图标为圣斯德望十字架
-    """
-    try:
-        icon_path = get_icon_path()
-        if icon_path:
-            # 为每个Toplevel创建新的PhotoImage
-            # 注意：必须保存引用以防止被垃圾回收
-            photo = tk.PhotoImage(file=icon_path)
-            toplevel.iconphoto(False, photo)
-            # 将photo保存到窗口对象上以防止被回收
-            toplevel._icon_photo = photo
-    except Exception as e:
-        print(f"设置Toplevel图标失败: {e}")
+        photo = tk.PhotoImage(file=ICON_PATH)
+        window.iconphoto(default, photo)
+        window._icon_photo = photo  # 保留引用，防止被回收
+    except tk.TclError as e:
+        logger.warning(f"设置窗口图标失败: {e}")

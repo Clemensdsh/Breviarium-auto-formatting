@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import os
 import logging
-from typing import Dict, Optional, Any
+from typing import Dict, Optional
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
@@ -194,47 +194,12 @@ class TexMappingConfig:
             return True
         return False
     
-    def all_types(self) -> list:
-        """获取所有类型名称"""
-        return list(self._mapping.keys())
-    
     def to_dict(self) -> Dict[str, Dict[str, str]]:
         """转换为可序列化的字典"""
         return {
             k: {"double_col": v.double_col, "single_col": v.single_col}
             for k, v in self._mapping.items()
         }
-    
-    def save_to_json(self, filepath: str) -> None:
-        """保存到JSON文件"""
-        try:
-            with open(filepath, 'w', encoding='utf-8') as f:
-                json.dump(self.to_dict(), f, indent=2, ensure_ascii=False)
-            logger.info(f"配置已保存到: {filepath}")
-        except IOError as e:
-            logger.error(f"保存配置失败: {e}")
-            raise
-    
-    @classmethod
-    def load_from_json(cls, filepath: str) -> TexMappingConfig:
-        """从JSON文件加载"""
-        if not os.path.exists(filepath):
-            logger.warning(f"配置文件不存在，使用默认配置: {filepath}")
-            return cls()
-        
-        try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            mapping = {
-                k: TexCommand(v["double_col"], v["single_col"])
-                for k, v in data.items()
-            }
-            logger.info(f"已加载配置: {filepath}")
-            return cls(mapping)
-        except (IOError, json.JSONDecodeError, KeyError) as e:
-            logger.error(f"加载配置失败，使用默认配置: {e}")
-            return cls()
 
 
 # 内容文件分类配置

@@ -8,10 +8,9 @@ modules.py - 时辰模块定义
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any, Callable
+from dataclasses import dataclass
+from typing import List, Optional, Dict, Any
 from enum import Enum
-import copy
 
 from .models import ContentItem
 
@@ -38,20 +37,6 @@ class HourType(Enum):
     COMPLINE_LOTH = "compline_loth"         # 新礼夜祷 (Completorium)
 
 
-class ComponentType(Enum):
-    """组件类型枚举"""
-    NOCTURN = "nocturn"                     # 单个夜课单元
-    PSALM_WITH_ANTIPHON = "psalm_antiphon"  # 带对经的圣咏
-    LESSON_WITH_RESPONSORY = "lesson_resp"  # 读经+答唱
-    PRECES = "preces"                       # 祷词组
-    HYMN = "hymn"                           # 赞美诗
-    CANTICLE = "canticle"                   # 圣歌
-    CHAPTER = "chapter"                     # 短读经
-    COLLECT = "collect"                     # 集祷经
-    VERSICLE = "versicle"                   # 启应对
-    INTERCESSIONS = "intercessions"         # 信友祷词 (新礼)
-
-
 # 时辰类型显示名称
 HOUR_TYPE_NAMES: Dict[str, str] = {
     # 旧礼 1962
@@ -71,20 +56,6 @@ HOUR_TYPE_NAMES: Dict[str, str] = {
     "none_loth": "新礼日间祈祷-午后 (Nona)",
     "vespers_loth": "新礼晚祷 (Vesperae)",
     "compline_loth": "新礼夜祷 (Completorium)",
-}
-
-# 组件类型显示名称
-COMPONENT_TYPE_NAMES: Dict[str, str] = {
-    "nocturn": "夜课单元",
-    "psalm_antiphon": "圣咏（带对经）",
-    "lesson_resp": "读经+答唱",
-    "preces": "祷词组",
-    "hymn": "赞美诗",
-    "canticle": "圣歌",
-    "chapter": "短读经",
-    "collect": "集祷经",
-    "versicle": "启应对",
-    "intercessions": "信友祷词",
 }
 
 
@@ -132,10 +103,6 @@ class ModuleConfig:
             "show_gloria": self.show_gloria,
             "show_antiphon_repeat": self.show_antiphon_repeat,
         }
-    
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> ModuleConfig:
-        return cls(**{k: v for k, v in data.items() if hasattr(cls, k)})
 
 
 class BaseComponent(ABC):
@@ -161,24 +128,11 @@ class BaseComponent(ABC):
                 return slot
         return None
     
-    def set_slot_content(self, slot_id: str, content: ContentItem) -> bool:
-        slot = self.get_slot(slot_id)
-        if slot:
-            slot.content = content
-            return True
-        return False
-    
     def add_custom_item(self, item: ContentItem, position: int = -1) -> None:
         if position < 0 or position >= len(self._custom_items):
             self._custom_items.append(item)
         else:
             self._custom_items.insert(position, item)
-    
-    def remove_custom_item(self, index: int) -> bool:
-        if 0 <= index < len(self._custom_items):
-            self._custom_items.pop(index)
-            return True
-        return False
     
     @abstractmethod
     def expand(self) -> List[ContentItem]:
@@ -368,6 +322,7 @@ class HourModule(ABC):
 # ========================================
 # 1962年旧礼模块
 # ========================================
+
 
 class MatinsModule1962(HourModule):
     """旧礼夜课模块（Matutinum 1962）"""
@@ -581,6 +536,7 @@ class ComplineModule1962(HourModule):
 # ========================================
 # 新礼模块 (LOTH / Ordinary Form)
 # ========================================
+
 
 class OfficeOfReadingsModule(HourModule):
     """新礼诵读模块（Officium lectionis）"""
